@@ -1,58 +1,145 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# FixFacility - Frontend Pelaporan Kerusakan Fasilitas Kampus
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi frontend pelaporan kerusakan fasilitas kampus berbasis Laravel dan Blade. Frontend ini dibangun dengan fidelitas tinggi sesuai acuan desain (15 layar PNG di `docs/design/`) dan prototipe interaktif `docs/prototipe/FixFacility.html`.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Cara Menjalankan Aplikasi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+1. Pastikan dependensi PHP dan Laravel siap.
+2. Jalankan development server:
+   ```sh
+   php artisan serve
+   ```
+3. Buka browser pada alamat:
+   ```
+   http://127.0.0.1:8000
+   ```
+   Aplikasi akan otomatis mengarahkan ke halaman login (`/login`).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Akun Contoh (Demo Data)
+- **Pelapor (Mahasiswa/Warga Kampus)**:
+  - NIM: `F1G125017`
+  - Kata Sandi: `12345678`
+  - *Catatan*: NIM alphanumeric lainnya (min. 5 karakter) dengan sandi `12345678` juga diterima.
+- **Admin**:
+  - NIM/Username: `admin`
+  - Kata Sandi: `12345678`
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 📌 Daftar Halaman & Rute (Named Routes)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Semua rute didefinisikan di `routes/web.php` dan memiliki nama rute terstandar agar tim backend mudah menyambungkan.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| No | Halaman | Path URL | Nama Route | Controller / Method |
+|----|---------|----------|------------|---------------------|
+| 1 | Login | `/login` | `login` | `AuthController@showLoginForm` |
+| - | Proses Login | `/login` (POST) | `login.post` | `AuthController@login` |
+| - | Keluar (Logout) | `/logout` (GET/POST) | `logout` | `AuthController@logout` |
+| 2 | Dashboard Pelapor | `/pelapor/dashboard` | `pelapor.dashboard` | `PelaporController@dashboard` |
+| 3 | Buat Laporan | `/pelapor/laporan/buat` | `pelapor.laporan.create` | `PelaporController@create` |
+| - | Simpan Laporan | `/pelapor/laporan` (POST) | `pelapor.laporan.store` | `PelaporController@store` |
+| 4 | Daftar Laporan Pelapor | `/pelapor/laporan` | `pelapor.laporan.index` | `PelaporController@index` |
+| 5 | Detail Laporan Pelapor | `/pelapor/laporan/{kode}` | `pelapor.laporan.show` | `PelaporController@show` |
+| 6 | Dashboard Admin | `/admin/dashboard` | `admin.dashboard` | `AdminController@dashboard` |
+| 7 | Semua Laporan Admin | `/admin/laporan` | `admin.laporan.index` | `AdminController@laporanIndex` |
+| 8 | Detail & Update Status Admin | `/admin/laporan/{kode}` | `admin.laporan.show` | `AdminController@laporanShow` |
+| - | Update Status Laporan | `/admin/laporan/{kode}/status` (POST) | `admin.laporan.update` | `AdminController@laporanUpdate` |
+| - | Hapus Laporan | `/admin/laporan/{kode}` (DELETE) | `admin.laporan.destroy` | `AdminController@laporanDestroy` |
+| 9 | Rekap Laporan | `/admin/rekap` | `admin.rekap` | `AdminController@rekap` |
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 🧪 Pengujian State Visual (15 Layar Desain)
 
-```bash
-composer require laravel/boost --dev
+Setiap variasi state visual dari file desain di `docs/design/` dapat dilihat dan diuji langsung:
 
-php artisan boost:install
-```
+1. **Login - Normal**:  
+   `GET /login`
+2. **Login - NIM/NIP Salah atau Kosong** (`01 Login-Salah Email (2).png`):  
+   `GET /login?state=nim_error`
+3. **Login - Sandi Salah** (`01 Login - Password Salah (2).png`):  
+   `GET /login?state=password_error`
+4. **Dashboard Pelapor** (`02 Dashboard Pelapor (2).png`):  
+   `GET /pelapor/dashboard`
+5. **Formulir Buat Laporan - Normal** (`03 Formulir Buat Laporan (2).png`):  
+   `GET /pelapor/laporan/buat`
+6. **Formulir Buat Laporan - Data Belum Lengkap** (`03 Formulir Buat Laporan - Data Belum Lengkap (2).png`):  
+   `GET /pelapor/laporan/buat?state=incomplete` (atau klik tombol Kirim saat form kosong)
+7. **Formulir Buat Laporan - Pesan Foto Tidak Valid** (`03 Formulir Buat Laporan - Pesan Foto Tidak Valid (2).png`):  
+   `GET /pelapor/laporan/buat?state=invalid_photo` (atau upload file bukan JPG/PNG / > 5MB)
+8. **Daftar Laporan Pelapor - Berisi** (`04 Daftar Laporan Pelapor (2).png`):  
+   `GET /pelapor/laporan`
+9. **Daftar Laporan Pelapor - Belum Ada Laporan** (`04 Daftar Laporan Pelapor - Belum ada laporan (2).png`):  
+   `GET /pelapor/laporan?empty=1`
+10. **Detail Laporan Pelapor** (`05 Detail Laporan Pelapor (2).png`):  
+    `GET /pelapor/laporan/FF-008`
+11. **Dashboard Admin** (`06 Dashboard Admin (2).png`):  
+    `GET /admin/dashboard`
+12. **Semua Laporan Admin** (`07 Semua Laporan Admin (2).png`):  
+    `GET /admin/laporan` (tersedia pencarian, filter status, filter kategori dinamis)
+13. **Detail & Update Status Admin** (`08 Detail dan Update Status Admin (2).png`):  
+    `GET /admin/laporan/FF-008` (pilih status via select atau chips)
+14. **Detail Admin - Modal Konfirmasi Hapus** (`08 Detail dan Update Status Admin - Konfirmasi Hapus (2).png`):  
+    `GET /admin/laporan/FF-008?state=modal_hapus` (atau klik tombol "Hapus Laporan")
+15. **Rekap Laporan** (`09 Rekap Laporan (2).png`):  
+    `GET /admin/rekap`
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 🧩 Komponen Blade (`resources/views/components/`)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Komponen yang berulang telah diekstrak ke Blade components agar modular dan tidak terjadi duplikasi:
 
-## Code of Conduct
+1. `<x-status-badge :status="$status" />`:  
+   Menampilkan label status dengan warna khusus:
+   - `Menunggu` (kuning muda)
+   - `Diproses` (biru muda)
+   - `Selesai` (hijau muda)
+2. `<x-stat-card :label="$label" :value="$value" :subtext="$subtext" />`:  
+   Menampilkan kartu metrik statistik 4 kolom.
+3. `<x-sidebar-item :route="$routeName" :active="$isActive">Label</x-sidebar-item>`:  
+   Menampilkan item navigasi sidebar dengan state aktif.
+4. `<x-progress-bar :label="$label" :value="$value" :max="$max" :color="$color" />`:  
+   Menampilkan bilah progres/chart batang horizontal CSS.
+5. `<x-empty-state :title="$title" :message="$msg" :actionText="$text" :actionUrl="$url" />`:  
+   Menampilkan kartu state kosong dengan ilustrasi dokumen dan tombol aksi.
+6. `<x-modal-konfirmasi :id="$id" :title="$title" :desc="$desc" :action="$actionUrl" />`:  
+   Modal popup konfirmasi penghapusan dengan backdrop dan form `@csrf` + `@method('DELETE')`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🔌 Panduan Titik Sambung untuk Tim Backend
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Untuk menyambungkan logika backend dan database sesungguhnya:
 
-## License
+1. **Sumber Data Dummy (`app/Support/DummyData.php`)**:
+   - Seluruh data laporan, statistik, kategori, dan rekap berada di `app/Support/DummyData.php`.
+   - Ganti pemanggilan method statis di `PelaporController` dan `AdminController` dengan query model Eloquent (misal `Laporan::query()`, `Laporan::where(...)`).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+2. **Autentikasi (`app/Http/Controllers/AuthController.php`)**:
+   - Hubungkan method `login()` dengan `Auth::attempt(['nim' => $request->nim, 'password' => $request->password])`.
+   - Sesuaikan pengalihan berdasarkan role pengguna (`Auth::user()->role === 'admin'`).
+
+3. **Form Buat Laporan (`pelapor/laporan/create.blade.php`)**:
+   - Atribut input `name` sudah disesuaikan:
+     - `judul` (string)
+     - `fasilitas` (string)
+     - `lokasi` (string)
+     - `kategori` (string)
+     - `deskripsi` (text)
+     - `foto` (file image, JPG/PNG, max 5MB)
+   - Tangani penyimpanan file foto bukti kerusakan pada `PelaporController@store` (`$request->file('foto')->store(...)`).
+
+4. **Pembaruan Status Laporan (`admin/laporan/show.blade.php`)**:
+   - Form mengarah ke `route('admin.laporan.update', $kode)` dengan input `name="status"`.
+   - Update field `status` pada model terkait di `AdminController@laporanUpdate`.
+
+5. **Penghapusan Laporan (`admin/laporan/show.blade.php`)**:
+   - Form modal konfirmasi mengirim request `DELETE` ke `route('admin.laporan.destroy', $kode)`.
+   - Jalankan `Laporan::where('kode', $kode)->delete()` pada `AdminController@laporanDestroy`.
+
+6. **Filter & Rekap (`admin/laporan/index.blade.php` & `admin/rekap.blade.php`)**:
+   - Query parameters `q`, `status`, dan `kategori` sudah ditangkap di `AdminController@laporanIndex`.
+   - Data rekap periode dapat dihubungkan dengan agregasi data SQL/Eloquent (misal `COUNT(*)` per status dan kategori).

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FixFacility</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1e293b;--mu:#64748b;--ln:#e2e8f0;--pr:#2563eb;--prs:#e8effd;--dk:#1e293b;--dk2:#293a56;--wt:#fef3c7;--wtx:#92600a;--ps:#e8effd;--ptx:#2563eb;--ok:#dcf5e6;--oktx:#16794a;--rd:#c92a35;--rds:#fde8e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f172a;--card:#1e293b;--tx:#e2e8f0;--mu:#94a3b8;--ln:#334155;--prs:#1e3a6e;--dk:#0b1220;--dk2:#16233d;--wt:#4a3a0f;--wtx:#fcd34d;--ps:#1e3a6e;--ptx:#93b4fb;--ok:#14452c;--oktx:#6ee7a0;--rds:#4a1d22;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--tx:#e2e8f0;--mu:#94a3b8;--ln:#334155;--prs:#1e3a6e;--dk:#0b1220;--dk2:#16233d;--wt:#4a3a0f;--wtx:#fcd34d;--ps:#1e3a6e;--ptx:#93b4fb;--ok:#14452c;--oktx:#6ee7a0;--rds:#4a1d22;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 Inter,system-ui,sans-serif}
+a{color:var(--pr);text-decoration:none;font-weight:600;cursor:pointer}
+.app{display:flex;min-height:100vh}
+.side{width:238px;background:var(--card);padding:28px 16px;display:flex;flex-direction:column;flex-shrink:0}
+.logo{font-size:24px;font-weight:700;color:var(--pr);padding:0 12px}.sub{font-size:10px;font-weight:600;color:var(--mu);letter-spacing:.04em;padding:6px 12px 28px}
+.nav{padding:11px 14px;border-radius:10px;color:var(--mu);font-weight:600;cursor:pointer;margin-bottom:8px}.nav.on{background:var(--prs);color:var(--pr)}
+.out{margin-top:auto}
+.main{flex:1;padding:32px 40px;max-width:1120px}
+h1{font-size:26px;margin:0}.lead{color:var(--mu);margin:6px 0 26px}h2{font-size:18px;margin:0}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:22px;margin-bottom:22px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}.stat b{display:block;font-size:30px;margin:2px 0}.stat span{color:var(--mu);font-size:13px}.stat a{font-size:12px}
+.btn{background:var(--pr);color:#fff;border:0;border-radius:10px;padding:12px 20px;font:600 14px Inter,sans-serif;cursor:pointer}.btn.red{background:var(--rd)}.btn.gr{background:var(--ln);color:var(--tx)}.btn.w{width:100%}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}th{text-align:left;font-size:11px;color:var(--mu);letter-spacing:.04em;padding:11px 10px;background:var(--bg)}td{padding:18px 10px;border-bottom:1px solid var(--ln)}tr:last-child td{border:0}
+.b{display:inline-block;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600}.Menunggu{background:var(--wt);color:var(--wtx)}.Diproses{background:var(--ps);color:var(--ptx)}.Selesai{background:var(--ok);color:var(--oktx)}
+.bar{display:flex;align-items:center;gap:16px;margin:20px 0}.bar i{width:110px;font-style:normal;color:var(--mu);font-size:13px}.bar div{flex:1;height:10px;background:var(--bg);border-radius:9px}.bar div u{display:block;height:100%;border-radius:9px;background:var(--pr)}.bar b{width:30px}
+.fl{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}.fl .full{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:7px}
+input,select,textarea{width:100%;padding:13px 14px;border:1px solid var(--ln);border-radius:10px;background:var(--bg);color:var(--tx);font:14px Inter,sans-serif}
+textarea{min-height:110px;resize:vertical}.err input,.err select,.err textarea{border-color:var(--rd);background:var(--card)}.em{color:var(--rd);font-size:12px;margin-top:4px;display:none}.err .em{display:block}
+.alert{background:var(--wt);color:var(--wtx);border-radius:10px;padding:14px 18px;margin-bottom:18px;display:none}.alert b{display:block}
+.drop{border:1px dashed var(--ln);background:var(--bg);border-radius:10px;padding:20px;cursor:pointer}.drop b{color:var(--pr)}.drop small{color:var(--mu)}.err .drop{border:1px solid var(--rd);background:var(--rds)}.err .drop b{color:var(--tx)}
+.two{display:grid;grid-template-columns:1.7fr 1fr;gap:26px;align-items:start}
+.row{display:grid;grid-template-columns:120px 1fr;padding:14px 0}.row span{color:var(--mu);font-size:13px}
+.ph{width:270px;height:160px;background:var(--prs);color:var(--pr);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:600}
+.chips{display:flex;gap:8px;margin:14px 0 22px;flex-wrap:wrap}.chips .b{cursor:pointer}
+.tl{border-left:2px solid var(--ln);margin:18px 0 0 6px;padding-left:20px}.tl div{position:relative;padding-bottom:26px}.tl div:before{content:"";position:absolute;left:-27px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--ln)}.tl .on:before{background:#b8700a}.tl small{display:block;color:var(--mu)}
+.note{background:var(--prs);color:var(--pr);border-radius:10px;padding:14px;font-size:12px;margin-top:30px}
+.empty{text-align:center;padding:50px 0}.empty .ic{width:270px;height:190px;background:var(--prs);border-radius:20px;margin:0 auto 26px;display:flex;align-items:center;justify-content:center}.empty .ic u{width:88px;height:112px;border:1px solid var(--pr);border-radius:12px;background:var(--card)}
+.login{display:flex;min-height:100vh}.lf{width:38%;background:var(--dk);color:#fff;padding:70px 50px}.lf h1{font-size:34px}.lf p{color:#cbd5e1}.hero{background:var(--dk2);border-radius:24px;height:300px;margin-top:70px;padding:30px;display:flex;flex-direction:column;justify-content:flex-end}.hero h3{margin:0 0 8px;font-size:20px;text-transform:uppercase}.lr{flex:1;display:flex;align-items:center;padding:40px 8%}.lr form{width:100%;max-width:470px}
+.mask{position:fixed;inset:0;background:rgba(30,41,59,.55);display:none;align-items:center;justify-content:center;z-index:9}.mask.on{display:flex}.mod{background:var(--card);border-radius:20px;padding:30px;width:min(520px,92vw);text-align:center}.mod .x{width:72px;height:72px;border-radius:50%;background:var(--rds);color:var(--rd);font-size:30px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 18px}.mod p{color:var(--mu)}.mod .acts{display:flex;gap:16px;margin-top:22px}.mod .acts button{flex:1}
+.fi{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:16px;align-items:end}
+@media(max-width:860px){.app,.login{flex-direction:column}.side{width:auto;flex-direction:row;flex-wrap:wrap;padding:14px;gap:4px;align-items:center}.sub{display:none}.out{margin:0 0 0 auto}.nav{margin:0}.main{padding:22px 16px}.grid4,.two,.fl,.fi{grid-template-columns:1fr 1fr}.two,.fl,.fi{grid-template-columns:1fr}.lf{width:auto;padding:40px 24px}.hero{height:170px;margin-top:30px}.ph{width:100%}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="mask" id="mask"><div class="mod"><div class="x">!</div><h2 style="text-align:left" id="mt"></h2><p style="text-align:left" id="mp"></p><div class="acts"><button class="btn gr" onclick="mask.classList.remove('on')">Batal</button><button class="btn red" onclick="hapus()">Ya, Hapus</button></div></div></div>
+<script>
+const $=s=>document.querySelector(s);
+let user=null,cur=null,newPhoto=null;
+let R=[
+{k:'FF-008',t:'Lampu koridor mati',p:'Andi',f:'Lampu koridor',l:'Gedung A, Lantai 2',s:'Gedung A',c:'Kelistrikan',d:'Lampu di koridor lantai 2 tidak menyala sejak pagi.',tg:'12 Nov 2026',st:'Menunggu'},
+{k:'FF-007',t:'Kursi ruang kelas rusak',p:'Siti',f:'Kursi kelas',l:'Ruang 203',s:'Ruang 203',c:'Peralatan kelas',d:'Dua kursi patah di bagian sandaran.',tg:'10 Nov 2026',st:'Diproses'},
+{k:'FF-006',t:'Keran wastafel bocor',p:'Budi',f:'Keran wastafel',l:'Toilet Lt. 1',s:'Toilet Lt. 1',c:'Sanitasi',d:'Keran menetes terus dan lantai licin.',tg:'08 Nov 2026',st:'Selesai'},
+{k:'FF-005',t:'AC tidak dingin',p:'Rina',f:'AC',l:'Ruang 101',s:'Ruang 101',c:'Peralatan kelas',d:'AC menyala tetapi tidak mengeluarkan udara dingin.',tg:'05 Nov 2026',st:'Selesai'}];
+const badge=s=>`<span class="b ${s}">${s}</span>`;
+const cnt=s=>s?R.filter(r=>r.st==s).length:R.length;
+const mine=()=>user&&user.role=='pelapor'&&user.data?R:[];
+function layout(role,page,body){
+ const items=role=='admin'?[['a-dashboard','Dashboard'],['a-laporan','Semua Laporan'],['a-rekap','Rekap Laporan']]:[['dashboard','Dashboard'],['buat','Buat Laporan'],['daftar','Daftar Laporan']];
+ const act={'a-detail':'a-laporan',detail:'daftar'}[page]||page;
+ return `<div class="app"><aside class="side"><div class="logo">FixFacility</div><div class="sub">${role=='admin'?'ADMIN PANEL':'PORTAL PELAPOR'}</div>${items.map(i=>`<div class="nav ${i[0]==act?'on':''}" onclick="go('${i[0]}')">${i[1]}</div>`).join('')}<div class="nav out" onclick="user=null;go('login')">Keluar</div></aside><main class="main">${body}</main></div>`}
+function head(t,s,btn){return `<div class="top"><div><h1>${t}</h1><p class="lead">${s}</p></div>${btn||''}</div>`}
+const bl='<button class="btn" onclick="go(\'buat\')">+ Buat Laporan</button>';
+function rows(list,mode){return list.map(r=>`<tr><td>${mode=='a'?'<b>'+r.k+'</b>':'<span style="color:var(--mu)">'+r.k+'</span>'}</td><td><b>${r.t}</b></td>${mode=='a'?`<td style="color:var(--mu)">${r.p}</td>`:''}<td style="color:var(--mu)">${mode=='a'?r.s:r.l}</td><td style="color:var(--mu)">${r.tg}</td><td>${badge(r.st)}</td><td><a onclick="open_('${r.k}','${mode=='a'?'a-detail':'detail'}')">Detail →</a></td></tr>`).join('')}
+const V={
+login(){return `<div class="login"><div class="lf"><h1>FixFacility</h1><p>Laporan kerusakan fasilitas kampus</p><div class="hero"><h3>Fasilitas kampus lebih terawat</h3><p style="margin:0">Laporkan kerusakan dan pantau proses tindak lanjutnya.</p></div></div><div class="lr"><form onsubmit="return masuk(event)"><h1>Selamat datang</h1><p class="lead">Masuk menggunakan akun kampus yang telah terdaftar.</p><div id="g1" style="margin-bottom:20px"><label>NIM/NIP</label><input id="nim" placeholder="NIM/NIP"><div class="em" id="e1">NIM/NIP salah atau kosong!</div></div><div id="g2" style="margin-bottom:28px"><label>Kata sandi</label><input id="pw" type="password" placeholder="Kata sandi"><div class="em" id="e2">Kata sandi salah.</div></div><button class="btn w">Masuk</button><p style="color:var(--mu);font-size:12px;margin-top:18px">Data contoh: NIM <b>F1G125017</b> atau <b>admin</b>, sandi <b>12345678</b>. NIM lain = akun tanpa laporan.</p></form></div></div>`},
+dashboard(){const m=mine();return layout('pelapor','dashboard',head('Dashboard Pelapor','Pantau laporan kerusakan fasilitas yang telah kamu kirim.',bl)+`<h2 style="margin:-14px 0 24px">Selamat pagi!</h2><div class="grid4">${[['Total Laporan',m.length,'Semua laporan kamu'],['Menunggu',m.filter(r=>r.st=='Menunggu').length,'Belum ditinjau'],['Diproses',m.filter(r=>r.st=='Diproses').length,'Sedang ditangani'],['Selesai',m.filter(r=>r.st=='Selesai').length,'Telah ditindaklanjuti']].map(x=>`<div class="card stat"><span>${x[0]}</span><b>${String(x[1]).padStart(2,'0')}</b><a>${x[2]}</a></div>`).join('')}</div><div class="card"><h2>Laporan Terbaru</h2><p class="lead" style="margin:4px 0 12px;font-size:13px">Daftar laporan yang terakhir kamu kirim.</p>${m.length?`<div class="scroll"><table><tr><th>KODE</th><th>JUDUL LAPORAN</th><th>FASILITAS</th><th>TANGGAL</th><th>STATUS</th><th></th></tr>${rows(m.slice(0,3),'p')}</table></div>`:'<p style="color:var(--mu)">Belum ada laporan.</p>'}</div>`)},
+buat(){return layout('pelapor','buat',head('Buat Laporan Kerusakan','Isi informasi kerusakan fasilitas secara lengkap dan sertakan foto bukti.')+`<div class="card"><div class="alert" id="al"><b>Periksa kembali data laporan</b>Masih ada kolom wajib yang belum diisi.</div><h2 style="margin-bottom:18px" id="ik">Informasi Kerusakan</h2><div class="fl">
+<div class="g"><label>Judul laporan *</label><input id="f_t" placeholder="Apa yang ingin dilaporkan"><div class="em">Wajib diisi</div></div>
+<div class="g"><label>Fasilitas *</label><select id="f_f"><option value="">Pilih fasilitas</option><option>Lampu</option><option>Kursi / meja</option><option>AC</option><option>Keran / toilet</option><option>Proyektor</option></select><div class="em">Wajib diisi</div></div>
+<div class="g"><label>Lokasi *</label><input id="f_l" placeholder="Tempat ditemukannya kerusakan"><div class="em">Wajib diisi</div></div>
+<div class="g"><label>Kategori kerusakan *</label><select id="f_c"><option value="">Pilih kategori</option><option>Kelistrikan</option><option>Peralatan kelas</option><option>Sanitasi</option><option>Bangunan</option></select><div class="em">Wajib diisi</div></div>
+<div class="g full"><label>Deskripsi kerusakan *</label><textarea id="f_d" placeholder="Jelaskan kondisi kerusakan dan kapan ditemukan."></textarea><div class="em">Wajib diisi</div></div>
+<div class="g full" id="gp"><label>Foto Bukti Kerusakan *</label><div class="drop" onclick="$('#file').click()"><b id="dt">+ Klik untuk memilih foto atau seret file ke sini</b><br><small id="ds">Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto</small></div><input type="file" id="file" accept="image/*" hidden onchange="pilihFoto(this)"></div></div>
+<div style="text-align:right;margin-top:22px"><button class="btn" onclick="kirim()">Kirim Laporan</button></div></div>`)},
+daftar(){const m=mine();return layout('pelapor','daftar',head('Daftar Laporan Saya','Lihat seluruh laporan kerusakan yang pernah kamu kirim dan pantau statusnya.',m.length?bl:'')+`<div class="card"><h2>Semua Laporan</h2><p style="color:var(--mu);font-size:13px;margin:4px 0 12px">${m.length?'Menampilkan laporan milik akun kamu.':'0 laporan'}</p>${m.length?`<div class="scroll"><table><tr><th>KODE</th><th>JUDUL LAPORAN</th><th>FASILITAS / LOKASI</th><th>TANGGAL</th><th>STATUS</th><th></th></tr>${rows(m,'p')}</table></div>`:`<div class="empty"><div class="ic"><u></u></div><h2>Belum ada laporan</h2><p style="color:var(--mu)">Kamu belum pernah mengirim laporan kerusakan fasilitas.<br>Mulai dengan membuat laporan pertama agar kerusakan dapat segera ditangani.</p><button class="btn" onclick="go('buat')">+ Buat Laporan</button></div>`}</div>`)},
+detail(){const r=cur;const steps=[['Laporan dikirim',r.tg+' • 09.30',1]];if(r.st!='Menunggu')steps.push(['Laporan diproses','Sedang ditangani petugas',1]);if(r.st=='Selesai')steps.push(['Selesai','Kerusakan telah ditindaklanjuti',1]);if(r.st=='Menunggu')steps.push(['Menunggu ditinjau','Admin belum memberikan pembaruan.',0]);
+return layout('pelapor','detail',head('Detail Laporan','Informasi lengkap dan perkembangan laporan kerusakan kamu.')+`<div class="two"><div class="card"><span style="color:var(--mu)">${r.k} • Dikirim ${r.tg}</span><h1 style="margin:8px 0 12px">${r.t}</h1>${badge(r.st)}<hr style="border:0;border-top:1px solid var(--ln);margin:18px 0 4px">${info(r)}<h2 style="font-size:15px;margin:22px 0 12px">Foto bukti kerusakan</h2><div class="ph" style="background:var(--ln);color:var(--mu)">Pratinjau foto</div></div><div class="card"><h2>Riwayat Perkembangan</h2><div class="tl">${steps.map((s,i)=>`<div class="${s[2]&&i==steps.length-1?'on':''}"><b>${s[0]}</b><small>${s[1]}</small></div>`).join('')}</div><div class="note">Kamu akan menerima pembaruan saat status laporan berubah.</div></div></div>`)},
+'a-dashboard'(){const mx=cnt();return layout('admin','a-dashboard',head('Dashboard Admin','Ringkasan laporan kerusakan fasilitas dari seluruh warga kampus.')+`<div class="grid4">${[['Total Laporan',128,'Seluruh laporan masuk'],['Menunggu',24,'Perlu ditinjau'],['Diproses',36,'Sedang ditangani'],['Selesai',68,'Sudah ditindaklanjuti']].map(x=>`<div class="card stat"><span>${x[0]}</span><b>${x[1]}</b><a>${x[2]}</a></div>`).join('')}</div><div class="card"><h2>Ringkasan Status Laporan</h2>${bars([['Menunggu',24,'#9a6208'],['Diproses',36,'#2563eb'],['Selesai',68,'#1a7f56']],128)}</div><div class="card"><h2 style="margin-bottom:8px">Laporan Terbaru</h2><div class="scroll"><table>${R.slice(0,2).map(r=>`<tr><td style="color:var(--mu)">${r.p}</td><td><b>${r.t}</b></td><td style="color:var(--mu)">${r.s}</td><td style="color:var(--mu)">${r.tg}</td><td>${badge(r.st)}</td><td><a onclick="open_('${r.k}','a-detail')">Detail →</a></td></tr>`).join('')}</table></div></div>`)},
+'a-laporan'(){return layout('admin','a-laporan',head('Semua Laporan','Kelola, tinjau, dan tindak lanjuti laporan dari seluruh warga kampus.','<button class="btn" onclick="go(\'buat\')">+ Tambah Laporan</button>')+`<div class="card"><div class="fi"><div><label>Cari laporan</label><input id="q" placeholder="Cari kode, judul, pelapor..."></div><div><label>Status</label><select id="fs"><option value="">Semua status</option><option>Menunggu</option><option>Diproses</option><option>Selesai</option></select></div><div><label>Kategori</label><select id="fc"><option value="">Semua kategori</option><option>Kelistrikan</option><option>Peralatan kelas</option><option>Sanitasi</option><option>Bangunan</option></select></div><button class="btn" onclick="filter()">Terapkan</button></div></div><div class="card"><h2>Daftar Laporan</h2><p style="color:var(--mu);font-size:13px;margin:4px 0 12px" id="jml">128 laporan tercatat</p><div class="scroll"><table><tr><th>KODE</th><th>JUDUL LAPORAN</th><th>PELAPOR</th><th>LOKASI</th><th>TANGGAL</th><th>STATUS</th><th>AKSI</th></tr><tbody id="tb">${rows(R,'a')}</tbody></table></div></div>`)},
+'a-detail'(){const r=cur;return layout('admin','a-detail',head('Detail Laporan','Periksa bukti kerusakan dan perbarui status laporan.')+`<div class="two"><div class="card"><span style="color:var(--mu)">${r.k} • ${r.tg.replace(' Nov',' November')}</span><h1 style="margin:8px 0 12px">${r.t}</h1>${badge(r.st)}${info(r)}<h2 style="font-size:15px;margin:22px 0 12px">Foto Bukti</h2><div class="ph">Pratinjau foto</div></div><div class="card"><h2>Pembaruan Status</h2><p style="color:var(--mu);font-size:13px">Pilih status terbaru laporan ini.</p><label>Status laporan</label><select id="ns"><option value="">Pilih status</option>${['Menunggu','Diproses','Selesai'].map(s=>`<option>${s}</option>`).join('')}</select><div class="chips">${['Menunggu','Diproses','Selesai'].map(s=>`<span class="b ${s}" onclick="$('#ns').value='${s}'">${s}</span>`).join('')}</div><button class="btn w" onclick="simpan()">Simpan Perubahan</button><button class="btn red w" style="margin-top:8px" onclick="tanya()">Hapus Laporan</button></div></div>`)},
+'a-rekap'(){return layout('admin','a-rekap',head('Rekap Laporan','Statistik laporan kerusakan fasilitas kampus.')+`<div class="card top" style="align-items:center"><div style="width:240px"><label>Periode rekap</label><select><option>November 2026</option><option>Oktober 2026</option></select></div><span style="color:var(--mu);font-size:13px">Data diperbarui: 20 Nov 2026</span></div><div class="grid4">${[['Total Laporan',128,'Semua laporan masuk'],['Menunggu',24,'18,8% dari total'],['Diproses',36,'28,1% dari total'],['Selesai',68,'53,1% dari total']].map(x=>`<div class="card stat"><span>${x[0]}</span><b>${x[1]}</b><span style="font-size:12px">${x[2]}</span></div>`).join('')}</div><div class="fl"><div class="card"><h2>Komposisi Status Laporan</h2>${bars([['Menunggu',24,'#b8700a'],['Diproses',36,'#2563eb'],['Selesai',68,'#16905a']],68)}</div><div class="card"><h2>Laporan per Kategori</h2>${bars([['Kelistrikan',42,'#2563eb'],['Peralatan kelas',35,'#2563eb'],['Sanitasi',28,'#2563eb'],['Bangunan',23,'#2563eb']],50)}</div></div><b>Ringkasan periode</b><p style="color:var(--mu)">Kategori terbanyak: Kelistrikan • Tingkat penyelesaian: 53,1%</p>`)}
+};
+function bars(a,max){return a.map(x=>`<div class="bar"><i>${x[0]}</i><div><u style="width:${x[1]/max*100}%;background:${x[2]}"></u></div><b>${x[1]}</b></div>`).join('')}
+function info(r){return [['Fasilitas',r.f],['Lokasi',r.l],['Kategori',r.c],['Deskripsi',r.d]].map(x=>`<div class="row"><span>${x[0]}</span><div>${x[1]}</div></div>`).join('')}
+function go(p){location.hash=p}
+function open_(k,p){cur=R.find(r=>r.k==k);go(p)}
+function render(){let p=location.hash.slice(1)||'login';if(!V[p])p='login';
+ const adm=p.startsWith('a-');if(p!='login'&&!user)p='login';else if(user&&p!='login'&&adm!=(user.role=='admin'))p=user.role=='admin'?'a-dashboard':'dashboard';
+ if((p=='detail'||p=='a-detail')&&!cur)p=user&&user.role=='admin'?'a-laporan':'daftar';
+ if(p=='buat'&&user&&user.role=='admin'){}
+ $('#root').innerHTML=V[p]();window.scrollTo(0,0);newPhoto=null}
+function masuk(e){e.preventDefault();const n=$('#nim').value.trim(),w=$('#pw').value;const okN=['F1G125017','admin'].includes(n)||/^[A-Z0-9]{6,}$/i.test(n)&&n!='';
+ $('#g1').classList.toggle('err',!okN);$('#g2').classList.toggle('err',okN&&w!='12345678');if(!okN||w!='12345678')return false;
+ user={role:n.toLowerCase()=='admin'?'admin':'pelapor',data:n.toUpperCase()=='F1G125017'};go(user.role=='admin'?'a-dashboard':'dashboard');return false}
+function pilihFoto(i){const f=i.files[0];if(!f)return;const ok=/image\/(jpeg|png)/.test(f.type)&&f.size<=5*1048576;newPhoto=ok?f:null;
+ $('#gp').classList.toggle('err',!ok);$('#dt').textContent=ok?f.name:'Foto tidak valid';$('#ds').textContent=ok?'Foto siap dikirim.':'Format harus JPG atau PNG dan maksimal 5 MB.'}
+function kirim(){let bad=false;['f_t','f_f','f_l','f_c','f_d'].forEach(id=>{const e=$('#'+id),b=!e.value.trim();e.parentNode.classList.toggle('err',b);bad=bad||b});
+ if(!newPhoto){$('#gp').classList.add('err');bad=true}
+ $('#al').style.display=bad?'block':'none';if(bad)return;
+ const n='FF-0'+String(9+R.length-4).padStart(2,'0');R.unshift({k:n,t:$('#f_t').value,p:'Kamu',f:$('#f_f').value,l:$('#f_l').value,s:$('#f_l').value,c:$('#f_c').value,d:$('#f_d').value,tg:'21 Nov 2026',st:'Menunggu'});if(user)user.data=true;go('daftar')}
+function filter(){const q=$('#q').value.toLowerCase(),s=$('#fs').value,c=$('#fc').value;const l=R.filter(r=>(!q||(r.k+r.t+r.p).toLowerCase().includes(q))&&(!s||r.st==s)&&(!c||r.c==c));
+ $('#tb').innerHTML=l.length?rows(l,'a'):'<tr><td colspan="7" style="text-align:center;color:var(--mu)">Tidak ada laporan yang cocok.</td></tr>';$('#jml').textContent=l.length+' laporan ditemukan'}
+function simpan(){const v=$('#ns').value;if(!v){alert('Pilih status terlebih dahulu.');return}cur.st=v;render()}
+function tanya(){$('#mt').textContent='Hapus laporan ini?';$('#mp').textContent='Laporan '+cur.k+' — '+cur.t+' akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.';mask.classList.add('on')}
+function hapus(){R=R.filter(r=>r!=cur);cur=null;mask.classList.remove('on');go('a-laporan')}
+addEventListener('hashchange',render);render();
+</script>
+</body>
+</html>

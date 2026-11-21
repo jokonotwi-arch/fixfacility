@@ -1,47 +1,52 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+@extends('layouts.auth')
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+@section('content')
+<form id="form-login" method="POST" action="{{ route('login') }}">
+    @csrf
+    <h1 style="font-size: 28px; margin-bottom: 6px;">Selamat datang</h1>
+    <p class="lead" style="margin-bottom: 28px;">Masuk menggunakan akun kampus yang telah terdaftar.</p>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    @php
+        $errorState = request('error') ?? request('state');
+        $hasNimError = $errors->has('nim') || $errorState === 'nim' || $errorState === 'nim_error';
+        $hasPasswordError = $errors->has('password') || $errorState === 'password' || $errorState === 'password_error';
+    @endphp
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <div class="g {{ $hasNimError ? 'err' : '' }}" id="g-nim" style="margin-bottom: 20px;">
+        <label for="nim">NIM/NIP</label>
+        <input 
+            type="text" 
+            id="nim" 
+            name="nim" 
+            placeholder="{{ $hasNimError ? 'NIM/NIP salah atau kosong!' : 'NIM/NIP' }}"
+            value="{{ $hasNimError ? '' : old('nim', request('nim')) }}"
+            autocomplete="username"
+        >
+        <div class="em" id="e1">NIM/NIP salah atau kosong!</div>
+    </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+    <div class="g {{ $hasPasswordError ? 'err' : '' }}" id="g-password" style="margin-bottom: 28px;">
+        <label for="password">Kata sandi</label>
+        <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Kata sandi"
+            autocomplete="current-password"
+            value="{{ $hasPasswordError ? '12345678' : '' }}"
+        >
+        <div class="em" id="e2">Kata sandi salah.</div>
+    </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    <button type="submit" class="btn w">Masuk</button>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    <div style="color: var(--mu); font-size: 12px; margin-top: 20px; line-height: 1.6;">
+        Data contoh: NIM <b>F1G125017</b> atau <b>admin</b>, sandi <b>12345678</b>.<br>
+        <span style="opacity: 0.85;">Test state visual: 
+            <a href="{{ route('login', ['state' => 'nim_error']) }}">NIM Salah</a> • 
+            <a href="{{ route('login', ['state' => 'password_error']) }}">Sandi Salah</a> • 
+            <a href="{{ route('login') }}">Normal</a>
+        </span>
+    </div>
+</form>
+@endsection

@@ -41,8 +41,11 @@
 
         <h2 style="font-size: 15px; margin: 22px 0 12px;">Foto Bukti</h2>
         @if(!empty($laporan['foto']) && file_exists(public_path('storage/' . $laporan['foto'])))
-            <div style="margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--ln);">
+            <div class="detail-photo-wrapper" style="margin-top: 10px;" onclick="bukaLightbox('{{ asset('storage/' . $laporan['foto']) }}', '{{ addslashes($laporan['judul']) }}')" title="Klik untuk memperbesar">
                 <img src="{{ asset('storage/' . $laporan['foto']) }}" alt="Foto Bukti" style="width: 100%; max-height: 380px; object-fit: cover; display: block;">
+                <div class="detail-photo-overlay">
+                    <span>🔍 Klik untuk memperbesar foto</span>
+                </div>
             </div>
         @else
             <div class="ph">
@@ -59,7 +62,7 @@
             @csrf
             <div style="margin-bottom: 14px;">
                 <label for="status-select">Status laporan</label>
-                <select id="status-select" name="status">
+                <select id="status-select" name="status" class="select">
                     <option value="">Pilih status</option>
                     @foreach($formOptions['status'] as $st)
                         <option value="{{ $st }}" {{ $laporan['status'] === $st ? 'selected' : '' }}>{{ $st }}</option>
@@ -101,20 +104,4 @@
     :desc="'Laporan ' . $laporan['kode'] . ' — ' . $laporan['judul'] . ' akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.'"
     :action="route('admin.laporan.destroy', $laporan['kode'])"
 />
-
-<div style="color: var(--mu); font-size: 12px; margin-top: 14px;">
-    Test state visual: 
-    <a href="{{ route('admin.laporan.show', [$laporan['kode'], 'state' => 'modal_hapus']) }}">Tampilkan Modal Konfirmasi</a> • 
-    <a href="{{ route('admin.laporan.show', $laporan['kode']) }}">Normal</a>
-</div>
-
-@if(request('state') === 'modal_hapus' || request('modal') === '1')
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            bukaModalHapus('{{ $laporan['kode'] }}', '{{ addslashes($laporan['judul']) }}', '{{ route('admin.laporan.destroy', $laporan['kode']) }}');
-        });
-    </script>
-    @endpush
-@endif
 @endsection

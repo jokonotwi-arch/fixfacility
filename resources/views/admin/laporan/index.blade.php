@@ -25,7 +25,7 @@
         </div>
         <div>
             <label for="filter-status">Status</label>
-            <select id="filter-status" name="status">
+            <select id="filter-status" name="status" class="select">
                 <option value="">Semua status</option>
                 <option value="Menunggu" {{ request('status') === 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
                 <option value="Diproses" {{ request('status') === 'Diproses' ? 'selected' : '' }}>Diproses</option>
@@ -34,7 +34,7 @@
         </div>
         <div>
             <label for="filter-kategori">Kategori</label>
-            <select id="filter-kategori" name="kategori">
+            <select id="filter-kategori" name="kategori" class="select">
                 <option value="">Semua kategori</option>
                 @if(isset($formOptions['kategori']))
                     @foreach($formOptions['kategori'] as $opt)
@@ -57,7 +57,7 @@
 <div class="card">
     <h2>Daftar Laporan</h2>
     <p class="lead" id="laporan-count-text" style="margin: 4px 0 16px; font-size: 13px;">
-        {{ $totalCount ?? 128 }} laporan tercatat
+        {{ $totalCount ?? 0 }} laporan tercatat
     </p>
 
     <div class="scroll">

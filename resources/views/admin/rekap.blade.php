@@ -11,7 +11,7 @@
 <div class="card top" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="width: 240px;">
         <label for="rekap-periode">Periode rekap</label>
-        <select id="rekap-periode" name="periode" onchange="location.href='{{ route('admin.rekap') }}?periode=' + encodeURIComponent(this.value)">
+        <select id="rekap-periode" name="periode" class="select" onchange="location.href='{{ route('admin.rekap') }}?periode=' + encodeURIComponent(this.value)">
             @foreach($rekapSummary['periode_pilihan'] as $p)
                 <option value="{{ $p }}" {{ $rekapSummary['periode'] === $p ? 'selected' : '' }}>{{ $p }}</option>
             @endforeach

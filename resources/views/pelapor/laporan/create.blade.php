@@ -9,16 +9,13 @@
 </div>
 
 @php
-    $state = request('state');
-    $isIncomplete = $state === 'incomplete' || $errors->any();
-    $isInvalidPhoto = $state === 'invalid_photo';
-
-    $hasJudulErr = $errors->has('judul') || ($state === 'incomplete');
-    $hasFasilitasErr = $errors->has('fasilitas') || ($state === 'incomplete');
-    $hasLokasiErr = $errors->has('lokasi') || ($state === 'incomplete');
-    $hasKategoriErr = $errors->has('kategori') || ($state === 'incomplete');
-    $hasDeskripsiErr = $errors->has('deskripsi') || ($state === 'incomplete');
-    $hasFotoErr = $errors->has('foto') || $state === 'incomplete' || $state === 'invalid_photo';
+    $isIncomplete = $errors->any();
+    $hasJudulErr = $errors->has('judul');
+    $hasFasilitasErr = $errors->has('fasilitas');
+    $hasLokasiErr = $errors->has('lokasi');
+    $hasKategoriErr = $errors->has('kategori');
+    $hasDeskripsiErr = $errors->has('deskripsi');
+    $hasFotoErr = $errors->has('foto');
 @endphp
 
 <div class="card">
@@ -46,7 +43,7 @@
 
             <div class="g {{ $hasFasilitasErr ? 'err' : '' }}">
                 <label for="fasilitas">Fasilitas *</label>
-                <select id="fasilitas" name="fasilitas">
+                <select id="fasilitas" name="fasilitas" class="select">
                     <option value="">{{ $hasFasilitasErr ? ($errors->first('fasilitas') ?: 'Wajib diisi') : 'Pilih fasilitas' }}</option>
                     @foreach($formOptions['fasilitas'] as $opt)
                         <option value="{{ $opt }}" {{ old('fasilitas') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
@@ -69,7 +66,7 @@
 
             <div class="g {{ $hasKategoriErr ? 'err' : '' }}">
                 <label for="kategori">Kategori kerusakan *</label>
-                <select id="kategori" name="kategori">
+                <select id="kategori" name="kategori" class="select">
                     <option value="">{{ $hasKategoriErr ? ($errors->first('kategori') ?: 'Wajib diisi') : 'Pilih kategori' }}</option>
                     @foreach($formOptions['kategori'] as $opt)
                         <option value="{{ $opt }}" {{ old('kategori') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
@@ -90,20 +87,38 @@
 
             <div class="g full {{ $hasFotoErr ? 'err' : '' }}" id="group-foto">
                 <label>Foto Bukti Kerusakan *</label>
+                
+                {{-- Area Drop Zone --}}
                 <div class="drop {{ $hasFotoErr ? 'is-invalid' : '' }}" id="drop-foto">
-                    @if($isInvalidPhoto || ($errors->has('foto') && (str_contains($errors->first('foto'), 'format') || str_contains($errors->first('foto'), 'gambar'))))
-                        <b id="drop-title">+ Klik untuk memilih foto atau seret file ke sini</b>
-                        <small id="drop-subtitle">Format JPG atau PNG • Maksimal 5 MB</small>
-                    @elseif($errors->has('foto') || $isIncomplete)
-                        <b id="drop-title" style="color: var(--rd);">{{ $errors->first('foto') ?: 'Belum ada foto yang diunggah' }}</b>
-                        <small id="drop-subtitle">Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto</small>
-                    @else
-                        <b id="drop-title">+ Klik untuk memilih foto atau seret file ke sini</b>
-                        <small id="drop-subtitle">Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto</small>
-                    @endif
+                    <b id="drop-title">+ Klik untuk memilih foto atau seret file ke sini</b>
+                    <small id="drop-subtitle">Format JPG, JPEG, PNG, WEBP • Maksimal 5 MB • Minimal 1 foto</small>
                 </div>
-                <input type="file" id="input-foto" name="foto" accept="image/jpeg,image/png,image/jpg" hidden>
-                <div class="em">{{ $errors->first('foto') ?: 'Wajib diisi' }}</div>
+
+                {{-- Area Pratinjau Foto (muncul saat foto dipilih) --}}
+                <div id="foto-preview-wrapper" class="upload-preview-wrapper" style="display: none;">
+                    <div class="upload-preview-card">
+                        <img id="foto-preview-img" src="" alt="Pratinjau Foto" class="upload-preview-thumb">
+                        <div class="upload-preview-meta">
+                            <div class="upload-preview-info">
+                                <span id="foto-preview-name" class="upload-preview-filename">-</span>
+                                <span id="foto-preview-size" class="upload-preview-filesize">-</span>
+                            </div>
+                            <div class="upload-preview-actions">
+                                <button type="button" id="btn-ganti-foto" class="btn btn-sm btn-outline">Ganti foto</button>
+                                <button type="button" id="btn-hapus-foto" class="btn btn-sm btn-danger-outline">Hapus foto</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="file" id="input-foto" name="foto" accept="image/jpeg,image/png,image/jpg,image/webp" hidden>
+                <div class="em" id="foto-error-msg">{{ $errors->first('foto') ?: 'Wajib diisi' }}</div>
+
+                @if($errors->any())
+                    <small style="display: block; margin-top: 6px; color: var(--mu);">
+                        Pilih ulang foto Anda jika sebelumnya sudah dipilih.
+                    </small>
+                @endif
             </div>
         </div>
 
@@ -111,12 +126,5 @@
             <button type="submit" class="btn">Kirim Laporan</button>
         </div>
     </form>
-</div>
-
-<div style="color: var(--mu); font-size: 12px; margin-top: 8px;">
-    Test state visual: 
-    <a href="{{ route('pelapor.laporan.create', ['state' => 'incomplete']) }}">Data Belum Lengkap</a> • 
-    <a href="{{ route('pelapor.laporan.create', ['state' => 'invalid_photo']) }}">Foto Tidak Valid</a> • 
-    <a href="{{ route('pelapor.laporan.create') }}">Normal</a>
 </div>
 @endsection

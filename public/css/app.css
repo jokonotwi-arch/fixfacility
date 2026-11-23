@@ -31,6 +31,7 @@ body {
   color: var(--tx);
   font: 14px/1.5 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 a {
@@ -124,9 +125,10 @@ a:hover {
 
 .main {
   flex: 1;
-  padding: 32px 40px;
-  max-width: 1120px;
   width: 100%;
+  min-width: 0;
+  padding: 28px 32px;
+  box-sizing: border-box;
 }
 
 .top {
@@ -366,21 +368,27 @@ label {
   color: var(--tx);
 }
 
-input, select, textarea {
+input, textarea {
   width: 100%;
-  padding: 13px 14px;
+  padding: 12px 14px;
   border: 1px solid var(--ln);
   border-radius: 10px;
   background: var(--bg);
   color: var(--tx);
-  font: 14px 'Inter', sans-serif;
-  transition: border-color 0.15s, background-color 0.15s;
+  font: 14px/1.5 'Inter', sans-serif;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
   outline: none;
+  box-sizing: border-box;
 }
 
-input:focus, select:focus, textarea:focus {
+input[type="text"], input[type="password"] {
+  height: 48px;
+}
+
+input:focus, textarea:focus {
   border-color: var(--pr);
   background: var(--card);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 input::placeholder, textarea::placeholder {
@@ -392,10 +400,65 @@ textarea {
   resize: vertical;
 }
 
+/* Unified Custom Select Styling (Tugas 3) */
+select, .select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  height: 48px;
+  padding: 12px 42px 12px 14px;
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  background-color: var(--bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px 16px;
+  color: var(--tx);
+  font: 14px/1.5 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+select:hover, .select:hover {
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+}
+
+select:focus, .select:focus {
+  border-color: var(--pr);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+select:disabled, .select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f1f5f9;
+}
+
+/* Native Option Styling */
+select option, .select option {
+  padding: 10px 14px;
+  background: #ffffff;
+  color: var(--tx);
+  font-size: 14px;
+}
+
+select option[value=""], .select option[value=""],
+select option:disabled, .select option:disabled {
+  color: #94a3b8;
+}
+
 .fl {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px 28px;
+  width: 100%;
 }
 
 .fl .full {
@@ -407,6 +470,7 @@ textarea {
   grid-template-columns: 2fr 1fr 1fr auto;
   gap: 16px;
   align-items: end;
+  width: 100%;
 }
 
 /* Form Validation & Error States */
@@ -414,10 +478,19 @@ textarea {
   position: relative;
 }
 
-.err input, .err select, .err textarea,
-input.is-invalid, select.is-invalid, textarea.is-invalid {
+.err input, .err textarea,
+input.is-invalid, textarea.is-invalid {
   border-color: var(--rd) !important;
   background: var(--card) !important;
+  box-shadow: 0 0 0 3px rgba(201, 42, 53, 0.12) !important;
+}
+
+.err select, .err .select,
+select.is-invalid, .select.is-invalid {
+  border-color: var(--rd) !important;
+  background-color: var(--card) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c92a35' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  box-shadow: 0 0 0 3px rgba(201, 42, 53, 0.12) !important;
 }
 
 .err input::placeholder, .err textarea::placeholder {
@@ -454,41 +527,227 @@ input.is-invalid, select.is-invalid, textarea.is-invalid {
   margin-bottom: 2px;
 }
 
-/* Upload Dropzone */
+/* Upload Dropzone & Preview (Tugas 2) */
 .drop {
-  border: 1px dashed var(--ln);
+  border: 2px dashed var(--ln);
   background: var(--bg);
-  border-radius: 10px;
-  padding: 22px;
+  border-radius: 12px;
+  padding: 26px 20px;
   cursor: pointer;
-  text-align: left;
-  transition: all 0.15s;
+  text-align: center;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .drop b {
   color: var(--pr);
   font-weight: 600;
   font-size: 14px;
+  display: block;
 }
 
 .drop small {
   color: var(--mu);
   font-size: 12px;
   display: block;
-  margin-top: 4px;
+  margin-top: 5px;
 }
 
 .drop:hover {
   border-color: var(--pr);
+  background: #f8fafc;
 }
 
 .err .drop, .drop.is-invalid {
-  border: 1px solid var(--rd) !important;
+  border: 2px solid var(--rd) !important;
   background: var(--rds) !important;
 }
 
 .err .drop b, .drop.is-invalid b {
+  color: var(--rd);
+}
+
+/* Upload Preview */
+.upload-preview-wrapper {
+  margin-top: 10px;
+}
+
+.upload-preview-card {
+  border: 1px solid var(--ln);
+  border-radius: 12px;
+  background: var(--card);
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.upload-preview-thumb {
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  display: block;
+  background: #f1f5f9;
+}
+
+.upload-preview-meta {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border-top: 1px solid var(--ln);
+  flex-wrap: wrap;
+}
+
+.upload-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.upload-preview-filename {
+  font-weight: 600;
+  font-size: 13px;
   color: var(--tx);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280px;
+}
+
+.upload-preview-filesize {
+  font-size: 12px;
+  color: var(--mu);
+}
+
+.upload-preview-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 7px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  line-height: 1.2;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--pr);
+  border: 1px solid var(--pr);
+}
+
+.btn-outline:hover {
+  background: var(--prs);
+  color: var(--pr);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  color: var(--rd);
+  border: 1px solid var(--rd);
+}
+
+.btn-danger-outline:hover {
+  background: var(--rds);
+  color: var(--rd);
+}
+
+/* Detail Photo & Lightbox */
+.detail-photo-wrapper {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--ln);
+  cursor: pointer;
+}
+
+.detail-photo-wrapper:hover .detail-photo-overlay {
+  opacity: 1;
+}
+
+.detail-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.detail-photo-overlay span {
+  background: rgba(0, 0, 0, 0.65);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.lightbox-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.lightbox-modal.on {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -42px;
+  right: -10px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 10px;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.lightbox-close:hover {
+  opacity: 1;
+}
+
+.lightbox-caption {
+  color: #f1f5f9;
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Two-column Detail Layout */

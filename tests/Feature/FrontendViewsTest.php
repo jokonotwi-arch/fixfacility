@@ -61,7 +61,12 @@ class FrontendViewsTest extends TestCase
         $response->assertSee('Daftar Laporan Saya');
         $response->assertSee('FF-008');
 
-        $emptyResponse = $this->actingAs($this->pelapor)->get('/pelapor/laporan?empty=1');
+        $emptyUser = User::factory()->create([
+            'role' => 'pelapor',
+            'nim_nip' => 'F1G125999',
+            'name' => 'User Kosong',
+        ]);
+        $emptyResponse = $this->actingAs($emptyUser)->get('/pelapor/laporan');
         $emptyResponse->assertStatus(200);
         $emptyResponse->assertSee('Belum ada laporan');
         $emptyResponse->assertSee('0 laporan');
@@ -74,14 +79,9 @@ class FrontendViewsTest extends TestCase
         $response->assertSee('Buat Laporan Kerusakan');
         $response->assertSee('Informasi Kerusakan');
 
-        $resIncomplete = $this->actingAs($this->pelapor)->get('/pelapor/laporan/buat?state=incomplete');
-        $resIncomplete->assertStatus(200);
-        $resIncomplete->assertSee('Periksa kembali data laporan');
-        $resIncomplete->assertSee('Belum ada foto yang diunggah');
-
-        $resInvalidPhoto = $this->actingAs($this->pelapor)->get('/pelapor/laporan/buat?state=invalid_photo');
-        $resInvalidPhoto->assertStatus(200);
-        $resInvalidPhoto->assertSee('Format JPG atau PNG • Maksimal 5 MB');
+        // Test server-side validation error redirect
+        $invalidSubmit = $this->actingAs($this->pelapor)->post('/pelapor/laporan', []);
+        $invalidSubmit->assertSessionHasErrors(['judul', 'fasilitas', 'lokasi', 'kategori', 'deskripsi', 'foto']);
     }
 
     public function test_pelapor_laporan_detail()

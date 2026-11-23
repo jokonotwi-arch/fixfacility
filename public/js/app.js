@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 4. FORM VALIDATION & FILE UPLOAD (BUAT LAPORAN)
+    // 4. FORM VALIDATION & FILE UPLOAD DENGAN PRATINJAU (BUAT LAPORAN)
     // ----------------------------------------------------
     const formBuatLaporan = document.getElementById('form-buat-laporan');
     const fileInput = document.getElementById('input-foto');
@@ -100,26 +100,88 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropSubtitle = document.getElementById('drop-subtitle');
     const alertError = document.getElementById('alert-error-form');
 
+    const previewWrapper = document.getElementById('foto-preview-wrapper');
+    const previewImg = document.getElementById('foto-preview-img');
+    const previewName = document.getElementById('foto-preview-name');
+    const previewSize = document.getElementById('foto-preview-size');
+    const btnGantiFoto = document.getElementById('btn-ganti-foto');
+    const btnHapusFoto = document.getElementById('btn-hapus-foto');
+    const fotoErrorMsg = document.getElementById('foto-error-msg');
+    const photoGroup = document.getElementById('group-foto');
+
+    let currentPreviewUrl = null;
+
+    function formatFileSize(bytes) {
+        if (!bytes || bytes === 0) return '0 B';
+        if (bytes >= 1024 * 1024) {
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+        return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
+    function bersihkanFoto() {
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+            currentPreviewUrl = null;
+        }
+        if (previewImg) previewImg.src = '';
+        if (previewWrapper) previewWrapper.style.display = 'none';
+        if (dropZone) {
+            dropZone.style.display = 'block';
+            dropZone.classList.remove('is-invalid');
+        }
+        if (photoGroup) photoGroup.classList.remove('err');
+    }
+
     function handleFile(file) {
         if (!file) return;
 
-        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        const isValidType = validTypes.includes(file.type);
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+        const isValidType = validTypes.includes(file.type.toLowerCase()) || /\.(jpe?g|png|webp)$/i.test(file.name);
         const isValidSize = file.size <= 5 * 1024 * 1024; // 5 MB
 
-        const photoGroup = document.getElementById('group-foto');
-
-        if (!isValidType || !isValidSize) {
+        if (!isValidType) {
+            bersihkanFoto();
             if (photoGroup) photoGroup.classList.add('err');
             if (dropZone) dropZone.classList.add('is-invalid');
-            if (dropTitle) dropTitle.textContent = '+ Klik untuk memilih foto atau seret file ke sini';
-            if (dropSubtitle) dropSubtitle.textContent = 'Format JPG atau PNG • Maksimal 5 MB';
-        } else {
-            if (photoGroup) photoGroup.classList.remove('err');
-            if (dropZone) dropZone.classList.remove('is-invalid');
-            if (dropTitle) dropTitle.textContent = file.name;
-            if (dropSubtitle) dropSubtitle.textContent = 'Foto siap dikirim (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+            if (fotoErrorMsg) {
+                fotoErrorMsg.textContent = 'Format foto harus berupa JPG, PNG, atau WEBP.';
+                fotoErrorMsg.style.display = 'block';
+            }
+            return;
         }
+
+        if (!isValidSize) {
+            bersihkanFoto();
+            if (photoGroup) photoGroup.classList.add('err');
+            if (dropZone) dropZone.classList.add('is-invalid');
+            if (fotoErrorMsg) {
+                fotoErrorMsg.textContent = 'Ukuran foto maksimal 5 MB.';
+                fotoErrorMsg.style.display = 'block';
+            }
+            return;
+        }
+
+        // Foto valid: Bersihkan error dan tampilkan pratinjau
+        if (photoGroup) photoGroup.classList.remove('err');
+        if (dropZone) {
+            dropZone.classList.remove('is-invalid');
+            dropZone.style.display = 'none';
+        }
+        if (fotoErrorMsg) fotoErrorMsg.style.display = 'none';
+
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+        }
+        currentPreviewUrl = URL.createObjectURL(file);
+
+        if (previewImg) previewImg.src = currentPreviewUrl;
+        if (previewName) previewName.textContent = file.name;
+        if (previewSize) previewSize.textContent = formatFileSize(file.size);
+        if (previewWrapper) previewWrapper.style.display = 'block';
     }
 
     if (dropZone && fileInput) {
@@ -141,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     fileInput.files = e.dataTransfer.files;
                 } catch (err) {
-                    // Fallback for older browsers
+                    // Fallback
                 }
                 handleFile(e.dataTransfer.files[0]);
             }
@@ -151,6 +213,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (fileInput.files && fileInput.files.length) {
                 handleFile(fileInput.files[0]);
             }
+        });
+    }
+
+    if (btnGantiFoto && fileInput) {
+        btnGantiFoto.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
+
+    if (btnHapusFoto) {
+        btnHapusFoto.addEventListener('click', () => {
+            bersihkanFoto();
         });
     }
 
@@ -172,14 +246,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            const photoGroup = document.getElementById('group-foto');
             const hasPhoto = fileInput && fileInput.files && fileInput.files.length > 0;
             if (!hasPhoto) {
                 if (photoGroup) {
                     photoGroup.classList.add('err');
                     if (dropZone) dropZone.classList.add('is-invalid');
-                    if (dropTitle) dropTitle.textContent = 'Belum ada foto yang diunggah';
-                    if (dropSubtitle) dropSubtitle.textContent = 'Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto';
+                    if (fotoErrorMsg) {
+                        fotoErrorMsg.textContent = 'Foto bukti kerusakan wajib diunggah.';
+                        fotoErrorMsg.style.display = 'block';
+                    }
                 }
                 hasError = true;
             }
@@ -198,7 +273,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 5. LOGIN FORM VALIDATION (CLIENT-SIDE)
+    // 5. MODAL LIGHTBOX FOTO DETAIL LAPORAN
+    // ----------------------------------------------------
+    window.bukaLightbox = function (src, caption) {
+        let modal = document.getElementById('modal-lightbox');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modal-lightbox';
+            modal.className = 'lightbox-modal';
+            modal.innerHTML = `
+                <div class="lightbox-content" onclick="event.stopPropagation()">
+                    <button type="button" class="lightbox-close" onclick="tutupLightbox()">&times;</button>
+                    <img id="lightbox-img" src="" alt="Pratinjau Foto Penuh">
+                    <div id="lightbox-caption" class="lightbox-caption"></div>
+                </div>
+            `;
+            modal.addEventListener('click', window.tutupLightbox);
+            document.body.appendChild(modal);
+        }
+
+        const img = document.getElementById('lightbox-img');
+        const cap = document.getElementById('lightbox-caption');
+        if (img) img.src = src;
+        if (cap) cap.textContent = caption || '';
+
+        modal.classList.add('on');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.tutupLightbox = function () {
+        const modal = document.getElementById('modal-lightbox');
+        if (modal) {
+            modal.classList.remove('on');
+        }
+        document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            window.tutupLightbox();
+        }
+    });
+
+    // ----------------------------------------------------
+    // 6. LOGIN FORM VALIDATION (CLIENT-SIDE)
     // ----------------------------------------------------
     const loginForm = document.getElementById('form-login');
     if (loginForm) {

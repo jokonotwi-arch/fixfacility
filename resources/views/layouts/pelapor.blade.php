@@ -66,6 +66,15 @@
         </div>
     </div>
 
+    <!-- Modal Lightbox Foto -->
+    <div class="lightbox-modal" id="modal-lightbox" onclick="tutupLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button type="button" class="lightbox-close" onclick="tutupLightbox()">&times;</button>
+            <img id="lightbox-img" src="" alt="Pratinjau Foto Penuh">
+            <div id="lightbox-caption" class="lightbox-caption"></div>
+        </div>
+    </div>
+
     <script src="{{ asset('js/app.js') }}"></script>
     @stack('scripts')
 </body>

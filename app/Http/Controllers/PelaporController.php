@@ -71,11 +71,6 @@ class PelaporController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->query('empty') == '1') {
-            $laporan = [];
-            return view('pelapor.laporan.index', compact('laporan'));
-        }
-
         $laporan = Laporan::with(['fasilitas', 'kategori', 'status'])
             ->where('user_id', Auth::id())
             ->latest('id')

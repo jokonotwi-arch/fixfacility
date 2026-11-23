@@ -41,8 +41,11 @@
 
         <h2 style="font-size: 15px; margin: 22px 0 12px;">Foto bukti kerusakan</h2>
         @if(!empty($laporan['foto']) && file_exists(public_path('storage/' . $laporan['foto'])))
-            <div style="margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--ln);">
+            <div class="detail-photo-wrapper" style="margin-top: 10px;" onclick="bukaLightbox('{{ asset('storage/' . $laporan['foto']) }}', '{{ addslashes($laporan['judul']) }}')" title="Klik untuk memperbesar">
                 <img src="{{ asset('storage/' . $laporan['foto']) }}" alt="Foto bukti kerusakan" style="width: 100%; max-height: 380px; object-fit: cover; display: block;">
+                <div class="detail-photo-overlay">
+                    <span>🔍 Klik untuk memperbesar foto</span>
+                </div>
             </div>
         @else
             <div class="ph" style="background: var(--ln); color: var(--mu);">

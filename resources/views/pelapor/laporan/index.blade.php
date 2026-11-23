@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $isEmpty = request('empty') == '1' || count($laporan) === 0;
+    $isEmpty = count($laporan) === 0;
 @endphp
 
 <div class="top">
@@ -61,11 +61,5 @@
             :actionUrl="route('pelapor.laporan.create')"
         />
     @endif
-</div>
-
-<div style="color: var(--mu); font-size: 12px; margin-top: 8px;">
-    Test state visual: 
-    <a href="{{ route('pelapor.laporan.index') }}">Ada Laporan (Normal)</a> • 
-    <a href="{{ route('pelapor.laporan.index', ['empty' => 1]) }}">Belum Ada Laporan (Kosong)</a>
 </div>
 @endsection

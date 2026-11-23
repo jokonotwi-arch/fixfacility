@@ -12,12 +12,19 @@
     $state = request('state');
     $isIncomplete = $state === 'incomplete' || $errors->any();
     $isInvalidPhoto = $state === 'invalid_photo';
+
+    $hasJudulErr = $errors->has('judul') || ($state === 'incomplete');
+    $hasFasilitasErr = $errors->has('fasilitas') || ($state === 'incomplete');
+    $hasLokasiErr = $errors->has('lokasi') || ($state === 'incomplete');
+    $hasKategoriErr = $errors->has('kategori') || ($state === 'incomplete');
+    $hasDeskripsiErr = $errors->has('deskripsi') || ($state === 'incomplete');
+    $hasFotoErr = $errors->has('foto') || $state === 'incomplete' || $state === 'invalid_photo';
 @endphp
 
 <div class="card">
     <div class="alert {{ $isIncomplete ? 'show' : '' }}" id="alert-error-form">
         <b>Periksa kembali data laporan</b>
-        Masih ada kolom wajib yang belum diisi.
+        Masih ada kolom wajib yang belum diisi atau tidak sesuai.
     </div>
 
     <h2 style="margin-bottom: 20px;">Informasi Kerusakan</h2>
@@ -25,78 +32,78 @@
     <form id="form-buat-laporan" method="POST" action="{{ route('pelapor.laporan.store') }}" enctype="multipart/form-data">
         @csrf
         <div class="fl">
-            <div class="g {{ $isIncomplete ? 'err' : '' }}">
+            <div class="g {{ $hasJudulErr ? 'err' : '' }}">
                 <label for="judul">Judul laporan *</label>
                 <input 
                     type="text" 
                     id="judul" 
                     name="judul" 
-                    placeholder="{{ $isIncomplete ? 'Wajib diisi' : 'Apa yang ingin dilaporkan' }}"
+                    placeholder="{{ $hasJudulErr ? ($errors->first('judul') ?: 'Wajib diisi') : 'Apa yang ingin dilaporkan' }}"
                     value="{{ old('judul') }}"
                 >
-                <div class="em">Wajib diisi</div>
+                <div class="em">{{ $errors->first('judul') ?: 'Wajib diisi' }}</div>
             </div>
 
-            <div class="g {{ $isIncomplete ? 'err' : '' }}">
+            <div class="g {{ $hasFasilitasErr ? 'err' : '' }}">
                 <label for="fasilitas">Fasilitas *</label>
                 <select id="fasilitas" name="fasilitas">
-                    <option value="">{{ $isIncomplete ? 'Wajib diisi' : 'Pilih fasilitas' }}</option>
+                    <option value="">{{ $hasFasilitasErr ? ($errors->first('fasilitas') ?: 'Wajib diisi') : 'Pilih fasilitas' }}</option>
                     @foreach($formOptions['fasilitas'] as $opt)
                         <option value="{{ $opt }}" {{ old('fasilitas') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                     @endforeach
                 </select>
-                <div class="em">Wajib diisi</div>
+                <div class="em">{{ $errors->first('fasilitas') ?: 'Wajib diisi' }}</div>
             </div>
 
-            <div class="g {{ $isIncomplete ? 'err' : '' }}">
+            <div class="g {{ $hasLokasiErr ? 'err' : '' }}">
                 <label for="lokasi">Lokasi *</label>
                 <input 
                     type="text" 
                     id="lokasi" 
                     name="lokasi" 
-                    placeholder="{{ $isIncomplete ? 'Wajib diisi' : 'Tempat ditemukannya kerusakan' }}"
+                    placeholder="{{ $hasLokasiErr ? ($errors->first('lokasi') ?: 'Wajib diisi') : 'Tempat ditemukannya kerusakan' }}"
                     value="{{ old('lokasi') }}"
                 >
-                <div class="em">Wajib diisi</div>
+                <div class="em">{{ $errors->first('lokasi') ?: 'Wajib diisi' }}</div>
             </div>
 
-            <div class="g {{ $isIncomplete ? 'err' : '' }}">
+            <div class="g {{ $hasKategoriErr ? 'err' : '' }}">
                 <label for="kategori">Kategori kerusakan *</label>
                 <select id="kategori" name="kategori">
-                    <option value="">{{ $isIncomplete ? 'Wajib diisi' : 'Pilih kategori' }}</option>
+                    <option value="">{{ $hasKategoriErr ? ($errors->first('kategori') ?: 'Wajib diisi') : 'Pilih kategori' }}</option>
                     @foreach($formOptions['kategori'] as $opt)
                         <option value="{{ $opt }}" {{ old('kategori') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                     @endforeach
                 </select>
-                <div class="em">Wajib diisi</div>
+                <div class="em">{{ $errors->first('kategori') ?: 'Wajib diisi' }}</div>
             </div>
 
-            <div class="g full {{ $isIncomplete ? 'err' : '' }}">
+            <div class="g full {{ $hasDeskripsiErr ? 'err' : '' }}">
                 <label for="deskripsi">Deskripsi kerusakan *</label>
                 <textarea 
                     id="deskripsi" 
                     name="deskripsi" 
                     placeholder="Jelaskan kondisi kerusakan dan kapan ditemukan."
                 >{{ old('deskripsi') }}</textarea>
-                <div class="em">Wajib diisi</div>
+                <div class="em">{{ $errors->first('deskripsi') ?: 'Wajib diisi' }}</div>
             </div>
 
-            <div class="g full {{ ($isIncomplete || $isInvalidPhoto) ? 'err' : '' }}" id="group-foto">
+            <div class="g full {{ $hasFotoErr ? 'err' : '' }}" id="group-foto">
                 <label>Foto Bukti Kerusakan *</label>
-                <div class="drop {{ ($isIncomplete || $isInvalidPhoto) ? 'is-invalid' : '' }}" id="drop-foto">
-                    @if($isInvalidPhoto)
+                <div class="drop {{ $hasFotoErr ? 'is-invalid' : '' }}" id="drop-foto">
+                    @if($isInvalidPhoto || ($errors->has('foto') && (str_contains($errors->first('foto'), 'format') || str_contains($errors->first('foto'), 'gambar'))))
                         <b id="drop-title">+ Klik untuk memilih foto atau seret file ke sini</b>
                         <small id="drop-subtitle">Format JPG atau PNG • Maksimal 5 MB</small>
-                    @elseif($isIncomplete)
-                        <b id="drop-title" style="color: var(--rd);">Belum ada foto yang diunggah</b>
+                    @elseif($errors->has('foto') || $isIncomplete)
+                        <b id="drop-title" style="color: var(--rd);">{{ $errors->first('foto') ?: 'Belum ada foto yang diunggah' }}</b>
                         <small id="drop-subtitle">Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto</small>
                     @else
                         <b id="drop-title">+ Klik untuk memilih foto atau seret file ke sini</b>
                         <small id="drop-subtitle">Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto</small>
                     @endif
                 </div>
-                <input type="file" id="input-foto" name="foto" accept="image/jpeg,image/png" hidden>
-                <div class="em">Wajib diisi</div>
+                <input type="file" id="input-foto" name="foto" accept="image/jpeg,image/png,image/jpg" hidden>
+                <div class="em">{{ $errors->first('foto') ?: 'Wajib diisi' }}</div>
             </div>
         </div>
 

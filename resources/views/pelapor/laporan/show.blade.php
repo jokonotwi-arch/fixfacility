@@ -6,6 +6,9 @@
         <h1>Detail Laporan</h1>
         <p class="lead">Informasi lengkap dan perkembangan laporan kerusakan kamu.</p>
     </div>
+    <div>
+        <a href="{{ route('pelapor.laporan.index') }}" class="btn" style="background: var(--ln); color: var(--tx);">← Kembali</a>
+    </div>
 </div>
 
 <div class="two">
@@ -37,9 +40,15 @@
         </div>
 
         <h2 style="font-size: 15px; margin: 22px 0 12px;">Foto bukti kerusakan</h2>
-        <div class="ph" style="background: var(--ln); color: var(--mu);">
-            Pratinjau foto
-        </div>
+        @if(!empty($laporan['foto']) && file_exists(public_path('storage/' . $laporan['foto'])))
+            <div style="margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid var(--ln);">
+                <img src="{{ asset('storage/' . $laporan['foto']) }}" alt="Foto bukti kerusakan" style="width: 100%; max-height: 380px; object-fit: cover; display: block;">
+            </div>
+        @else
+            <div class="ph" style="background: var(--ln); color: var(--mu);">
+                Pratinjau foto
+            </div>
+        @endif
     </div>
 
     <div class="card">

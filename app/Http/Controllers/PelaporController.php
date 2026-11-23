@@ -2,8 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\DummyData;
+use App\Http\Requests\StoreLaporanRequest;
+use App\Models\Fasilitas;
+use App\Models\Kategori;
+use App\Models\Laporan;
+use App\Models\RiwayatStatus;
+use App\Models\StatusLaporan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PelaporController extends Controller
 {
@@ -12,9 +19,49 @@ class PelaporController extends Controller
      */
     public function dashboard()
     {
-        $stats = DummyData::getPelaporStats();
-        $laporanList = DummyData::getLaporanList();
-        $laporanTerbaru = array_slice($laporanList, 0, 3);
+        $userId = Auth::id();
+
+        $total = Laporan::where('user_id', $userId)->count();
+        $menunggu = Laporan::where('user_id', $userId)
+            ->whereHas('status', fn ($q) => $q->where('nama', 'Menunggu'))
+            ->count();
+        $diproses = Laporan::where('user_id', $userId)
+            ->whereHas('status', fn ($q) => $q->where('nama', 'Diproses'))
+            ->count();
+        $selesai = Laporan::where('user_id', $userId)
+            ->whereHas('status', fn ($q) => $q->where('nama', 'Selesai'))
+            ->count();
+
+        $stats = [
+            [
+                'label' => 'Total Laporan',
+                'value' => sprintf('%02d', $total),
+                'subtext' => 'Semua laporan kamu',
+            ],
+            [
+                'label' => 'Menunggu',
+                'value' => sprintf('%02d', $menunggu),
+                'subtext' => 'Belum ditinjau',
+            ],
+            [
+                'label' => 'Diproses',
+                'value' => sprintf('%02d', $diproses),
+                'subtext' => 'Sedang ditangani',
+            ],
+            [
+                'label' => 'Selesai',
+                'value' => sprintf('%02d', $selesai),
+                'subtext' => 'Telah ditindaklanjuti',
+            ],
+        ];
+
+        $laporanTerbaru = Laporan::with(['fasilitas', 'status'])
+            ->where('user_id', $userId)
+            ->latest('id')
+            ->take(3)
+            ->get()
+            ->map(fn ($item) => $item->formatForView())
+            ->all();
 
         return view('pelapor.dashboard', compact('stats', 'laporanTerbaru'));
     }
@@ -24,12 +71,17 @@ class PelaporController extends Controller
      */
     public function index(Request $request)
     {
-        $laporan = DummyData::getLaporanList();
-
-        // Support testing state kosong melalui parameter ?empty=1
         if ($request->query('empty') == '1') {
             $laporan = [];
+            return view('pelapor.laporan.index', compact('laporan'));
         }
+
+        $laporan = Laporan::with(['fasilitas', 'kategori', 'status'])
+            ->where('user_id', Auth::id())
+            ->latest('id')
+            ->get()
+            ->map(fn ($item) => $item->formatForView())
+            ->all();
 
         return view('pelapor.laporan.index', compact('laporan'));
     }
@@ -39,17 +91,66 @@ class PelaporController extends Controller
      */
     public function create()
     {
-        $formOptions = DummyData::getFormOptions();
+        $formOptions = [
+            'fasilitas' => Fasilitas::orderBy('id')->pluck('nama')->all(),
+            'kategori' => Kategori::orderBy('id')->pluck('nama')->all(),
+        ];
 
         return view('pelapor.laporan.create', compact('formOptions'));
     }
 
     /**
-     * Simpan Laporan (Dummy handler untuk form POST)
+     * Simpan Laporan dengan transaksi dan kode unik FF-xxx
      */
-    public function store(Request $request)
+    public function store(StoreLaporanRequest $request)
     {
-        // Backend developer nantinya dapat menyambungkan penyimpanan data di sini
+        $user = $request->user();
+
+        $laporan = DB::transaction(function () use ($request, $user) {
+            // Ambil nomor kode terbesar saat ini untuk mencegah race condition
+            $allKodes = Laporan::lockForUpdate()->pluck('kode');
+            $maxNum = 0;
+            foreach ($allKodes as $k) {
+                if (preg_match('/FF-(\d+)/', $k, $matches)) {
+                    $num = (int) $matches[1];
+                    if ($num > $maxNum) {
+                        $maxNum = $num;
+                    }
+                }
+            }
+            $nextNum = $maxNum + 1;
+            $kode = sprintf('FF-%03d', $nextNum);
+
+            // Simpan file foto bukti ke storage publik
+            $path = $request->file('foto')->store('laporan', 'public');
+
+            $fasilitasId = Fasilitas::where('nama', $request->fasilitas)->value('id');
+            $kategoriId = Kategori::where('nama', $request->kategori)->value('id');
+            $statusMenungguId = StatusLaporan::where('nama', 'Menunggu')->value('id');
+
+            $newLaporan = Laporan::create([
+                'kode' => $kode,
+                'user_id' => $user->id,
+                'fasilitas_id' => $fasilitasId,
+                'kategori_id' => $kategoriId,
+                'status_id' => $statusMenungguId,
+                'judul' => $request->judul,
+                'lokasi' => $request->lokasi,
+                'deskripsi' => $request->deskripsi,
+                'foto' => $path,
+            ]);
+
+            RiwayatStatus::create([
+                'laporan_id' => $newLaporan->id,
+                'status_id' => $statusMenungguId,
+                'diubah_oleh' => null,
+                'keterangan' => 'Laporan dikirim',
+                'created_at' => now(),
+            ]);
+
+            return $newLaporan;
+        });
+
         return redirect()->route('pelapor.laporan.index')
             ->with('success', 'Laporan berhasil dikirim!');
     }
@@ -59,11 +160,16 @@ class PelaporController extends Controller
      */
     public function show(string $kode)
     {
-        $laporan = DummyData::findLaporan($kode);
+        $laporanModel = Laporan::with(['user', 'fasilitas', 'kategori', 'status', 'riwayat.status', 'riwayat.pengubah'])
+            ->where('kode', $kode)
+            ->firstOrFail();
 
-        if (!$laporan) {
-            abort(404, 'Laporan tidak ditemukan');
+        // Pelapor hanya bisa melihat laporan miliknya sendiri
+        if ($laporanModel->user_id !== Auth::id()) {
+            abort(403, 'Anda tidak memiliki hak untuk melihat laporan ini.');
         }
+
+        $laporan = $laporanModel->formatForView();
 
         return view('pelapor.laporan.show', compact('laporan'));
     }

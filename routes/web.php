@@ -7,12 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes - FixFacility (Frontend Views)
+| Web Routes - FixFacility
 |--------------------------------------------------------------------------
-|
-| Rute frontend terstruktur dengan penamaan route ('pelapor.dashboard', dst.)
-| agar tim backend mudah menyambungkan controller/model/auth sesungguhnya.
-|
 */
 
 // Redirect root ke halaman login
@@ -23,7 +19,7 @@ Route::get('/', function () {
 // Autentikasi
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Portal Pelapor
 Route::prefix('pelapor')->name('pelapor.')->group(function () {

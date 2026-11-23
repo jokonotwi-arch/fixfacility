@@ -119,7 +119,7 @@ Untuk menyambungkan logika backend dan database sesungguhnya:
    - Ganti pemanggilan method statis di `PelaporController` dan `AdminController` dengan query model Eloquent (misal `Laporan::query()`, `Laporan::where(...)`).
 
 2. **Autentikasi (`app/Http/Controllers/AuthController.php`)**:
-   - Hubungkan method `login()` dengan `Auth::attempt(['nim' => $request->nim, 'password' => $request->password])`.
+   - Hubungkan method `login()` dengan `Auth::attempt(['nim_nip' => $request->nim, 'password' => $request->password])`.
    - Sesuaikan pengalihan berdasarkan role pengguna (`Auth::user()->role === 'admin'`).
 
 3. **Form Buat Laporan (`pelapor/laporan/create.blade.php`)**:

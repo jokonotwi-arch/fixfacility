@@ -18,11 +18,11 @@
             type="text" 
             id="nim" 
             name="nim" 
-            placeholder="{{ $hasNimError ? 'NIM/NIP salah atau kosong!' : 'NIM/NIP' }}"
+            placeholder="{{ $hasNimError ? ($errors->first('nim') ?: 'NIM/NIP salah atau kosong!') : 'NIM/NIP' }}"
             value="{{ $hasNimError ? '' : old('nim', request('nim')) }}"
             autocomplete="username"
         >
-        <div class="em" id="e1">NIM/NIP salah atau kosong!</div>
+        <div class="em" id="e1">{{ $errors->first('nim') ?: 'NIM/NIP salah atau kosong!' }}</div>
     </div>
 
     <div class="g {{ $hasPasswordError ? 'err' : '' }}" id="g-password" style="margin-bottom: 28px;">
@@ -35,7 +35,7 @@
             autocomplete="current-password"
             value="{{ $hasPasswordError ? '12345678' : '' }}"
         >
-        <div class="em" id="e2">Kata sandi salah.</div>
+        <div class="em" id="e2">{{ $errors->first('password') ?: 'Kata sandi salah.' }}</div>
     </div>
 
     <button type="submit" class="btn w">Masuk</button>

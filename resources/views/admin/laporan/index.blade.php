@@ -36,10 +36,16 @@
             <label for="filter-kategori">Kategori</label>
             <select id="filter-kategori" name="kategori">
                 <option value="">Semua kategori</option>
-                <option value="Kelistrikan" {{ request('kategori') === 'Kelistrikan' ? 'selected' : '' }}>Kelistrikan</option>
-                <option value="Peralatan kelas" {{ request('kategori') === 'Peralatan kelas' ? 'selected' : '' }}>Peralatan kelas</option>
-                <option value="Sanitasi" {{ request('kategori') === 'Sanitasi' ? 'selected' : '' }}>Sanitasi</option>
-                <option value="Bangunan" {{ request('kategori') === 'Bangunan' ? 'selected' : '' }}>Bangunan</option>
+                @if(isset($formOptions['kategori']))
+                    @foreach($formOptions['kategori'] as $opt)
+                        <option value="{{ $opt }}" {{ request('kategori') === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                    @endforeach
+                @else
+                    <option value="Kelistrikan" {{ request('kategori') === 'Kelistrikan' ? 'selected' : '' }}>Kelistrikan</option>
+                    <option value="Peralatan kelas" {{ request('kategori') === 'Peralatan kelas' ? 'selected' : '' }}>Peralatan kelas</option>
+                    <option value="Sanitasi" {{ request('kategori') === 'Sanitasi' ? 'selected' : '' }}>Sanitasi</option>
+                    <option value="Bangunan" {{ request('kategori') === 'Bangunan' ? 'selected' : '' }}>Bangunan</option>
+                @endif
             </select>
         </div>
         <div>
@@ -96,5 +102,11 @@
             </tbody>
         </table>
     </div>
+
+    @if(method_exists($laporan, 'links') && $laporan->hasPages())
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+            {{ $laporan->links() }}
+        </div>
+    @endif
 </div>
 @endsection

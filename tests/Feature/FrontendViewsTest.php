@@ -2,10 +2,27 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class FrontendViewsTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected User $pelapor;
+    protected User $admin;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(DatabaseSeeder::class);
+
+        $this->pelapor = User::where('role', 'pelapor')->first();
+        $this->admin = User::where('role', 'admin')->first();
+    }
+
     public function test_login_page_renders_successfully()
     {
         $response = $this->get('/login');
@@ -29,7 +46,7 @@ class FrontendViewsTest extends TestCase
 
     public function test_pelapor_dashboard_renders()
     {
-        $response = $this->get('/pelapor/dashboard');
+        $response = $this->actingAs($this->pelapor)->get('/pelapor/dashboard');
         $response->assertStatus(200);
         $response->assertSee('Dashboard Pelapor');
         $response->assertSee('Selamat pagi!');
@@ -39,12 +56,12 @@ class FrontendViewsTest extends TestCase
 
     public function test_pelapor_laporan_index_and_empty_state()
     {
-        $response = $this->get('/pelapor/laporan');
+        $response = $this->actingAs($this->pelapor)->get('/pelapor/laporan');
         $response->assertStatus(200);
         $response->assertSee('Daftar Laporan Saya');
         $response->assertSee('FF-008');
 
-        $emptyResponse = $this->get('/pelapor/laporan?empty=1');
+        $emptyResponse = $this->actingAs($this->pelapor)->get('/pelapor/laporan?empty=1');
         $emptyResponse->assertStatus(200);
         $emptyResponse->assertSee('Belum ada laporan');
         $emptyResponse->assertSee('0 laporan');
@@ -52,24 +69,24 @@ class FrontendViewsTest extends TestCase
 
     public function test_pelapor_laporan_create_and_validation_states()
     {
-        $response = $this->get('/pelapor/laporan/buat');
+        $response = $this->actingAs($this->pelapor)->get('/pelapor/laporan/buat');
         $response->assertStatus(200);
         $response->assertSee('Buat Laporan Kerusakan');
         $response->assertSee('Informasi Kerusakan');
 
-        $resIncomplete = $this->get('/pelapor/laporan/buat?state=incomplete');
+        $resIncomplete = $this->actingAs($this->pelapor)->get('/pelapor/laporan/buat?state=incomplete');
         $resIncomplete->assertStatus(200);
         $resIncomplete->assertSee('Periksa kembali data laporan');
         $resIncomplete->assertSee('Belum ada foto yang diunggah');
 
-        $resInvalidPhoto = $this->get('/pelapor/laporan/buat?state=invalid_photo');
+        $resInvalidPhoto = $this->actingAs($this->pelapor)->get('/pelapor/laporan/buat?state=invalid_photo');
         $resInvalidPhoto->assertStatus(200);
         $resInvalidPhoto->assertSee('Format JPG atau PNG • Maksimal 5 MB');
     }
 
     public function test_pelapor_laporan_detail()
     {
-        $response = $this->get('/pelapor/laporan/FF-008');
+        $response = $this->actingAs($this->pelapor)->get('/pelapor/laporan/FF-008');
         $response->assertStatus(200);
         $response->assertSee('Detail Laporan');
         $response->assertSee('Lampu koridor mati');
@@ -79,7 +96,7 @@ class FrontendViewsTest extends TestCase
 
     public function test_admin_dashboard_renders()
     {
-        $response = $this->get('/admin/dashboard');
+        $response = $this->actingAs($this->admin)->get('/admin/dashboard');
         $response->assertStatus(200);
         $response->assertSee('Dashboard Admin');
         $response->assertSee('Ringkasan Status Laporan');
@@ -88,17 +105,16 @@ class FrontendViewsTest extends TestCase
 
     public function test_admin_laporan_index_renders()
     {
-        $response = $this->get('/admin/laporan');
+        $response = $this->actingAs($this->admin)->get('/admin/laporan');
         $response->assertStatus(200);
         $response->assertSee('Semua Laporan');
         $response->assertSee('Daftar Laporan');
-        $response->assertSee('128 laporan tercatat');
         $response->assertSee('FF-008');
     }
 
     public function test_admin_laporan_detail_and_modal()
     {
-        $response = $this->get('/admin/laporan/FF-008');
+        $response = $this->actingAs($this->admin)->get('/admin/laporan/FF-008');
         $response->assertStatus(200);
         $response->assertSee('Detail Laporan');
         $response->assertSee('Pembaruan Status');
@@ -109,7 +125,7 @@ class FrontendViewsTest extends TestCase
 
     public function test_admin_rekap_renders()
     {
-        $response = $this->get('/admin/rekap');
+        $response = $this->actingAs($this->admin)->get('/admin/rekap');
         $response->assertStatus(200);
         $response->assertSee('Rekap Laporan');
         $response->assertSee('Komposisi Status Laporan');

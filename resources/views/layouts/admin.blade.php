@@ -24,9 +24,9 @@
                 Rekap Laporan
             </x-sidebar-item>
 
-            <form action="{{ route('login') }}" method="GET" class="out">
-                <button type="submit" class="nav out">Keluar</button>
-            </form>
+            <div class="out">
+                <button type="button" class="nav out" onclick="bukaModalLogout()">Keluar</button>
+            </div>
         </aside>
 
         <main class="main">
@@ -48,6 +48,22 @@
 
             @yield('content')
         </main>
+    </div>
+
+    <!-- Modal Konfirmasi Logout -->
+    <div class="mask" id="modal-konfirmasi-logout">
+        <div class="mod">
+            <div class="x" style="background: #f1f5f9; color: var(--tx);">!</div>
+            <h2>Anda akan keluar, yakin?</h2>
+            <p>Sesi login Anda akan diakhiri. Anda perlu memasukkan kredensial lagi untuk masuk.</p>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <div class="acts">
+                    <button type="button" class="btn gr" onclick="tutupModalLogout()">Batal</button>
+                    <button type="submit" class="btn red">Yakin</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script src="{{ asset('js/app.js') }}"></script>

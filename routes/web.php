@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PelaporController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,18 +12,26 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root ke halaman login
+// Redirect root
 Route::get('/', function () {
+    if (Auth::check()) {
+        return Auth::user()->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('pelapor.dashboard');
+    }
     return redirect()->route('login');
 });
 
 // Autentikasi
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Portal Pelapor
-Route::prefix('pelapor')->name('pelapor.')->group(function () {
+Route::middleware(['auth', 'role:pelapor'])->prefix('pelapor')->name('pelapor.')->group(function () {
     Route::get('/dashboard', [PelaporController::class, 'dashboard'])->name('dashboard');
     
     // CRUD Laporan Pelapor
@@ -33,7 +42,7 @@ Route::prefix('pelapor')->name('pelapor.')->group(function () {
 });
 
 // Admin Panel
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
     // Manajemen Laporan Admin

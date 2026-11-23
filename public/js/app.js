@@ -38,6 +38,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
+    // MODAL KONFIRMASI LOGOUT
+    // ----------------------------------------------------
+    const logoutModal = document.getElementById('modal-konfirmasi-logout');
+
+    window.bukaModalLogout = function () {
+        if (logoutModal) {
+            logoutModal.classList.add('on');
+        }
+    };
+
+    window.tutupModalLogout = function () {
+        if (logoutModal) {
+            logoutModal.classList.remove('on');
+        }
+    };
+
+    if (logoutModal) {
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                tutupModalLogout();
+            }
+        });
+    }
+
+    // ----------------------------------------------------
     // 2. ADMIN STATUS CHIPS & SELECT SYNC
     // ----------------------------------------------------
     const statusSelect = document.getElementById('status-select');

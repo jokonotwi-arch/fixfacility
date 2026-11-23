@@ -35,13 +35,13 @@ class FrontendViewsTest extends TestCase
 
     public function test_login_error_states_render()
     {
-        $resNim = $this->get('/login?state=nim_error');
-        $resNim->assertStatus(200);
-        $resNim->assertSee('NIM/NIP salah atau kosong!');
+        $resNim = $this->from('/login')->post('/login', ['nim' => '', 'password' => '12345678']);
+        $resNim->assertRedirect('/login');
+        $resNim->assertSessionHasErrors('nim');
 
-        $resPw = $this->get('/login?state=password_error');
-        $resPw->assertStatus(200);
-        $resPw->assertSee('Kata sandi salah.');
+        $resPw = $this->from('/login')->post('/login', ['nim' => 'F1G125017', 'password' => '']);
+        $resPw->assertRedirect('/login');
+        $resPw->assertSessionHasErrors('password');
     }
 
     public function test_pelapor_dashboard_renders()

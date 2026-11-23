@@ -1,5 +1,5 @@
 /**
- * FixFacility - Frontend Interactions
+ * FixFacility - Frontend Interactions & UI UX
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // MODAL KONFIRMASI LOGOUT
+    // 2. MODAL KONFIRMASI LOGOUT
     // ----------------------------------------------------
     const logoutModal = document.getElementById('modal-konfirmasi-logout');
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 2. ADMIN STATUS CHIPS & SELECT SYNC
+    // 3. ADMIN STATUS CHIPS & SELECT SYNC
     // ----------------------------------------------------
     const statusSelect = document.getElementById('status-select');
     const statusChips = document.querySelectorAll('.chips .chip-status');
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 3. FORM VALIDATION & FILE UPLOAD (BUAT LAPORAN)
+    // 4. FORM VALIDATION & FILE UPLOAD (BUAT LAPORAN)
     // ----------------------------------------------------
     const formBuatLaporan = document.getElementById('form-buat-laporan');
     const fileInput = document.getElementById('input-foto');
@@ -99,7 +99,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropTitle = document.getElementById('drop-title');
     const dropSubtitle = document.getElementById('drop-subtitle');
     const alertError = document.getElementById('alert-error-form');
-    let uploadedFile = null;
+
+    function handleFile(file) {
+        if (!file) return;
+
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const isValidType = validTypes.includes(file.type);
+        const isValidSize = file.size <= 5 * 1024 * 1024; // 5 MB
+
+        const photoGroup = document.getElementById('group-foto');
+
+        if (!isValidType || !isValidSize) {
+            if (photoGroup) photoGroup.classList.add('err');
+            if (dropZone) dropZone.classList.add('is-invalid');
+            if (dropTitle) dropTitle.textContent = '+ Klik untuk memilih foto atau seret file ke sini';
+            if (dropSubtitle) dropSubtitle.textContent = 'Format JPG atau PNG • Maksimal 5 MB';
+        } else {
+            if (photoGroup) photoGroup.classList.remove('err');
+            if (dropZone) dropZone.classList.remove('is-invalid');
+            if (dropTitle) dropTitle.textContent = file.name;
+            if (dropSubtitle) dropSubtitle.textContent = 'Foto siap dikirim (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
+        }
+    }
 
     if (dropZone && fileInput) {
         dropZone.addEventListener('click', () => fileInput.click());
@@ -116,7 +137,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.style.borderColor = '';
-            if (e.dataTransfer.files && e.dataTransfer.files.length) {
+            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) {
+                try {
+                    fileInput.files = e.dataTransfer.files;
+                } catch (err) {
+                    // Fallback for older browsers
+                }
                 handleFile(e.dataTransfer.files[0]);
             }
         });
@@ -126,26 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleFile(fileInput.files[0]);
             }
         });
-    }
-
-    function handleFile(file) {
-        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        const isValidType = validTypes.includes(file.type);
-        const isValidSize = file.size <= 5 * 1024 * 1024; // 5 MB
-
-        const photoGroup = document.getElementById('group-foto');
-
-        if (!isValidType || !isValidSize) {
-            uploadedFile = null;
-            if (photoGroup) photoGroup.classList.add('err');
-            if (dropTitle) dropTitle.textContent = '+ Klik untuk memilih foto atau seret file ke sini';
-            if (dropSubtitle) dropSubtitle.textContent = 'Format JPG atau PNG • Maksimal 5 MB';
-        } else {
-            uploadedFile = file;
-            if (photoGroup) photoGroup.classList.remove('err');
-            if (dropTitle) dropTitle.textContent = file.name;
-            if (dropSubtitle) dropSubtitle.textContent = 'Foto siap dikirim. (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB)';
-        }
     }
 
     if (formBuatLaporan) {
@@ -167,28 +173,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const photoGroup = document.getElementById('group-foto');
-            if (!uploadedFile && (!fileInput || !fileInput.files.length)) {
+            const hasPhoto = fileInput && fileInput.files && fileInput.files.length > 0;
+            if (!hasPhoto) {
                 if (photoGroup) {
                     photoGroup.classList.add('err');
+                    if (dropZone) dropZone.classList.add('is-invalid');
                     if (dropTitle) dropTitle.textContent = 'Belum ada foto yang diunggah';
                     if (dropSubtitle) dropSubtitle.textContent = 'Format JPG, PNG • Maksimal 5 MB • Minimal 1 foto';
                 }
                 hasError = true;
             }
 
+            // Hanya cegah pengiriman bila data tidak valid di sisi klien
             if (hasError) {
                 e.preventDefault();
                 if (alertError) alertError.classList.add('show');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 return false;
-            } else {
-                if (alertError) alertError.classList.remove('show');
             }
+
+            // Jika valid, biarkan form terkirim ke backend
+            if (alertError) alertError.classList.remove('show');
         });
     }
 
     // ----------------------------------------------------
-    // 4. LOGIN FORM VALIDATION & DEMO ROUTING
+    // 5. LOGIN FORM VALIDATION (CLIENT-SIDE)
     // ----------------------------------------------------
     const loginForm = document.getElementById('form-login');
     if (loginForm) {
@@ -197,6 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const pwInput = document.getElementById('password');
             const g1 = document.getElementById('g-nim');
             const g2 = document.getElementById('g-password');
+            const e1 = document.getElementById('e1');
+            const e2 = document.getElementById('e2');
 
             const nimVal = nimInput ? nimInput.value.trim() : '';
             const pwVal = pwInput ? pwInput.value : '';
@@ -205,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!nimVal) {
                 if (g1) g1.classList.add('err');
+                if (e1) e1.textContent = 'NIM/NIP wajib diisi.';
                 hasError = true;
             } else {
                 if (g1) g1.classList.remove('err');
@@ -212,114 +225,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!pwVal) {
                 if (g2) g2.classList.add('err');
+                if (e2) e2.textContent = 'Kata sandi wajib diisi.';
                 hasError = true;
             } else {
                 if (g2) g2.classList.remove('err');
             }
 
-            // Demo verification
-            if (!hasError) {
-                const isAdmin = nimVal.toLowerCase() === 'admin';
-                const isPelapor = /^[A-Za-z0-9]{5,}$/.test(nimVal);
-
-                if (!isAdmin && !isPelapor) {
-                    if (g1) g1.classList.add('err');
-                    hasError = true;
-                } else if (pwVal !== '12345678') {
-                    if (g2) g2.classList.add('err');
-                    hasError = true;
-                }
-
-                if (hasError) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                // If demo credentials match, navigate seamlessly
-                if (isAdmin) {
-                    window.location.href = '/admin/dashboard';
-                    e.preventDefault();
-                    return false;
-                } else {
-                    window.location.href = '/pelapor/dashboard';
-                    e.preventDefault();
-                    return false;
-                }
-            } else {
+            // Hanya cegah submit bila ada field yang kosong di sisi klien
+            if (hasError) {
                 e.preventDefault();
+                return false;
             }
-        });
-    }
 
-    // ----------------------------------------------------
-    // 5. ADMIN FILTER & SEARCH TABLE
-    // ----------------------------------------------------
-    const searchInput = document.getElementById('filter-search');
-    const statusFilter = document.getElementById('filter-status');
-    const kategoriFilter = document.getElementById('filter-kategori');
-    const btnTerapkan = document.getElementById('btn-filter-terapkan');
-    const tableBody = document.getElementById('laporan-tbody');
-    const countText = document.getElementById('laporan-count-text');
-
-    function applyAdminFilters() {
-        if (!tableBody) return;
-        const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
-        const s = statusFilter ? statusFilter.value : '';
-        const c = kategoriFilter ? kategoriFilter.value : '';
-
-        const rows = tableBody.querySelectorAll('tr[data-kode]');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            const kode = (row.getAttribute('data-kode') || '').toLowerCase();
-            const judul = (row.getAttribute('data-judul') || '').toLowerCase();
-            const pelapor = (row.getAttribute('data-pelapor') || '').toLowerCase();
-            const status = row.getAttribute('data-status') || '';
-            const kategori = row.getAttribute('data-kategori') || '';
-
-            const matchQuery = !q || kode.includes(q) || judul.includes(q) || pelapor.includes(q);
-            const matchStatus = !s || status === s;
-            const matchKategori = !c || kategori === c;
-
-            if (matchQuery && matchStatus && matchKategori) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Handle empty row
-        let noMatchRow = document.getElementById('row-no-match');
-        if (visibleCount === 0) {
-            if (!noMatchRow) {
-                noMatchRow = document.createElement('tr');
-                noMatchRow.id = 'row-no-match';
-                noMatchRow.innerHTML = '<td colspan="7" style="text-align:center;color:var(--mu);padding:24px;">Tidak ada laporan yang cocok.</td>';
-                tableBody.appendChild(noMatchRow);
-            }
-            noMatchRow.style.display = '';
-        } else if (noMatchRow) {
-            noMatchRow.style.display = 'none';
-        }
-
-        if (countText) {
-            countText.textContent = `${visibleCount} laporan ditemukan`;
-        }
-    }
-
-    if (btnTerapkan) {
-        btnTerapkan.addEventListener('click', (e) => {
-            e.preventDefault();
-            applyAdminFilters();
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                applyAdminFilters();
-            }
+            // Jika valid di sisi klien, biarkan form terkirim ke POST /login backend
         });
     }
 });

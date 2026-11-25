@@ -6,9 +6,6 @@
         <h1>Semua Laporan</h1>
         <p class="lead">Kelola, tinjau, dan tindak lanjuti laporan dari seluruh warga kampus.</p>
     </div>
-    <div>
-        <a href="{{ route('pelapor.laporan.create') }}" class="btn">+ Tambah Laporan</a>
-    </div>
 </div>
 
 <div class="card">

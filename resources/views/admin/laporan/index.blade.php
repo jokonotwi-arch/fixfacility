@@ -13,7 +13,7 @@
 
 <div class="card">
     <form method="GET" action="{{ route('admin.laporan.index') }}" class="fi" id="form-filter-admin">
-        <div>
+        <div class="fi-search">
             <label for="filter-search">Cari laporan</label>
             <input 
                 type="text" 
@@ -23,7 +23,7 @@
                 value="{{ request('q') }}"
             >
         </div>
-        <div>
+        <div class="fi-status">
             <label for="filter-status">Status</label>
             <select id="filter-status" name="status" class="select">
                 <option value="">Semua status</option>
@@ -32,7 +32,7 @@
                 <option value="Selesai" {{ request('status') === 'Selesai' ? 'selected' : '' }}>Selesai</option>
             </select>
         </div>
-        <div>
+        <div class="fi-kategori">
             <label for="filter-kategori">Kategori</label>
             <select id="filter-kategori" name="kategori" class="select">
                 <option value="">Semua kategori</option>
@@ -48,7 +48,7 @@
                 @endif
             </select>
         </div>
-        <div>
+        <div class="fi-btn">
             <button type="submit" class="btn" id="btn-filter-terapkan">Terapkan</button>
         </div>
     </form>

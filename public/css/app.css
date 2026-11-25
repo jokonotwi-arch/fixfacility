@@ -470,11 +470,34 @@ select option:disabled, .select option:disabled {
 }
 
 .fi {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 16px;
-  align-items: end;
+  align-items: flex-end;
   width: 100%;
+}
+
+.fi .fi-search,
+.fi > div:first-child {
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.fi .fi-status,
+.fi > div:nth-child(2) {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+.fi .fi-kategori,
+.fi > div:nth-child(3) {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.fi .fi-btn,
+.fi > div:last-child {
+  flex-shrink: 0;
 }
 
 /* Form Validation & Error States */
@@ -1096,8 +1119,17 @@ select.is-invalid, .select.is-invalid {
     padding: 22px 16px;
   }
   
-  .grid4, .two, .fl, .fi {
+  .grid4, .two, .fl {
     grid-template-columns: 1fr;
+  }
+  
+  .fi > div {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+  
+  .fi > div button {
+    width: 100% !important;
   }
   
   .lf {

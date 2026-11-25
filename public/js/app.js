@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusSelect.value = val;
                 statusChips.forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
+                statusSelect.dispatchEvent(new Event('change', { bubbles: true }));
             });
         });
 
@@ -358,4 +359,274 @@ document.addEventListener('DOMContentLoaded', () => {
             // Jika valid di sisi klien, biarkan form terkirim ke POST /login backend
         });
     }
+
+    // ----------------------------------------------------
+    // 7. MODERN ANIMATED CUSTOM DROPDOWN (ALL SELECTS)
+    // ----------------------------------------------------
+    const enhancedWrappers = [];
+
+    function closeAllDropdowns(exceptWrapper = null) {
+        enhancedWrappers.forEach(item => {
+            if (item.wrapper !== exceptWrapper) {
+                item.close(false);
+            }
+        });
+    }
+
+    function enhanceSelect(nativeSelect) {
+        if (!nativeSelect || nativeSelect.dataset.enhanced === 'true') return;
+        nativeSelect.dataset.enhanced = 'true';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select-wrapper';
+        if (nativeSelect.classList.contains('is-invalid')) {
+            wrapper.classList.add('is-invalid');
+        }
+
+        nativeSelect.parentNode.insertBefore(wrapper, nativeSelect);
+        wrapper.appendChild(nativeSelect);
+        nativeSelect.classList.add('custom-select-native');
+        nativeSelect.tabIndex = -1;
+        nativeSelect.setAttribute('aria-hidden', 'true');
+
+        const trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'custom-select-trigger';
+        trigger.setAttribute('role', 'combobox');
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', 'false');
+
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'custom-select-value';
+
+        const chevronSpan = document.createElement('span');
+        chevronSpan.className = 'custom-select-chevron';
+        chevronSpan.setAttribute('aria-hidden', 'true');
+        chevronSpan.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+
+        trigger.appendChild(valueSpan);
+        trigger.appendChild(chevronSpan);
+
+        const menu = document.createElement('div');
+        menu.className = 'custom-select-menu';
+        menu.setAttribute('role', 'listbox');
+
+        const optionButtons = [];
+        let highlightedIdx = -1;
+
+        function setHighlighted(index) {
+            optionButtons.forEach((btn, i) => {
+                btn.classList.toggle('is-highlighted', i === index);
+            });
+            highlightedIdx = index;
+            if (index >= 0 && optionButtons[index]) {
+                optionButtons[index].scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function syncFromNative() {
+            const selectedOption = nativeSelect.options[nativeSelect.selectedIndex] || nativeSelect.options[0];
+            if (selectedOption) {
+                valueSpan.textContent = selectedOption.textContent;
+                valueSpan.classList.toggle('is-placeholder', selectedOption.value === '');
+            } else {
+                valueSpan.textContent = '';
+                valueSpan.classList.add('is-placeholder');
+            }
+
+            optionButtons.forEach(btn => {
+                const isSelected = btn.dataset.value === nativeSelect.value;
+                btn.classList.toggle('is-selected', isSelected);
+                btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            });
+
+            trigger.disabled = nativeSelect.disabled;
+            trigger.classList.toggle('is-disabled', nativeSelect.disabled);
+        }
+
+        function openMenu() {
+            if (nativeSelect.disabled) return;
+            closeAllDropdowns(wrapper);
+
+            const rect = trigger.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+            wrapper.classList.toggle('open-up', spaceBelow < 240 && spaceAbove > spaceBelow);
+
+            wrapper.classList.add('is-open');
+            trigger.setAttribute('aria-expanded', 'true');
+
+            const selectedIdx = optionButtons.findIndex(btn => btn.dataset.value === nativeSelect.value);
+            setHighlighted(selectedIdx >= 0 ? selectedIdx : 0);
+        }
+
+        function closeMenu(restoreFocus = false) {
+            wrapper.classList.remove('is-open');
+            trigger.setAttribute('aria-expanded', 'false');
+            setHighlighted(-1);
+            if (restoreFocus) {
+                trigger.focus();
+            }
+        }
+
+        function selectOption(value) {
+            const changed = nativeSelect.value !== value;
+            nativeSelect.value = value;
+            syncFromNative();
+            closeMenu(true);
+
+            if (changed) {
+                nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        Array.from(nativeSelect.options).forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'custom-select-option';
+            btn.setAttribute('role', 'option');
+            btn.dataset.value = opt.value;
+            btn.dataset.index = String(idx);
+
+            if (opt.value === '') {
+                btn.classList.add('is-placeholder-option');
+            }
+            if (opt.disabled) {
+                btn.classList.add('is-disabled');
+                btn.disabled = true;
+            }
+
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = opt.textContent;
+
+            const checkSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            checkSvg.setAttribute('class', 'custom-select-check');
+            checkSvg.setAttribute('viewBox', '0 0 24 24');
+            checkSvg.setAttribute('fill', 'none');
+            checkSvg.setAttribute('stroke', 'currentColor');
+            checkSvg.setAttribute('stroke-width', '2.5');
+            checkSvg.setAttribute('stroke-linecap', 'round');
+            checkSvg.setAttribute('stroke-linejoin', 'round');
+            checkSvg.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', 'M20 6 9 17l-5-5');
+            checkSvg.appendChild(path);
+
+            btn.appendChild(labelSpan);
+            btn.appendChild(checkSvg);
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!opt.disabled) {
+                    selectOption(opt.value);
+                }
+            });
+
+            btn.addEventListener('mouseenter', () => {
+                if (!opt.disabled) {
+                    setHighlighted(idx);
+                }
+            });
+
+            menu.appendChild(btn);
+            optionButtons.push(btn);
+        });
+
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(menu);
+
+        syncFromNative();
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (wrapper.classList.contains('is-open')) {
+                closeMenu(false);
+            } else {
+                openMenu();
+            }
+        });
+
+        trigger.addEventListener('keydown', (e) => {
+            const isOpen = wrapper.classList.contains('is-open');
+
+            if (!isOpen && ['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
+                e.preventDefault();
+                openMenu();
+                return;
+            }
+
+            if (!isOpen) return;
+
+            const enabledIndices = optionButtons
+                .map((b, i) => (b.disabled ? -1 : i))
+                .filter(i => i !== -1);
+            if (!enabledIndices.length) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const pos = enabledIndices.indexOf(highlightedIdx);
+                const next = pos === -1 ? enabledIndices[0] : enabledIndices[(pos + 1) % enabledIndices.length];
+                setHighlighted(next);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const pos = enabledIndices.indexOf(highlightedIdx);
+                const prev = pos === -1
+                    ? enabledIndices[enabledIndices.length - 1]
+                    : enabledIndices[(pos - 1 + enabledIndices.length) % enabledIndices.length];
+                setHighlighted(prev);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                setHighlighted(enabledIndices[0]);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                setHighlighted(enabledIndices[enabledIndices.length - 1]);
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (highlightedIdx >= 0 && optionButtons[highlightedIdx] && !optionButtons[highlightedIdx].disabled) {
+                    selectOption(optionButtons[highlightedIdx].dataset.value);
+                } else {
+                    closeMenu(true);
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                closeMenu(true);
+            } else if (e.key === 'Tab') {
+                closeMenu(false);
+            }
+        });
+
+        nativeSelect.addEventListener('change', () => {
+            syncFromNative();
+            const group = nativeSelect.closest('.g');
+            if (group && nativeSelect.value.trim()) {
+                group.classList.remove('err');
+            }
+        });
+
+        nativeSelect.addEventListener('focus', () => {
+            trigger.focus();
+        });
+
+        if (nativeSelect.id) {
+            const label = document.querySelector(`label[for="${CSS.escape(nativeSelect.id)}"]`);
+            if (label) {
+                label.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    trigger.focus();
+                });
+            }
+        }
+
+        enhancedWrappers.push({ wrapper, close: closeMenu });
+    }
+
+    document.querySelectorAll('select').forEach(enhanceSelect);
+
+    document.addEventListener('click', (e) => {
+        enhancedWrappers.forEach(item => {
+            if (!item.wrapper.contains(e.target)) {
+                item.close(false);
+            }
+        });
+    });
 });
